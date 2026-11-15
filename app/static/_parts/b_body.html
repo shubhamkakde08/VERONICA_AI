@@ -1,0 +1,205 @@
+<body class="theme-aurora view-full">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="vg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c8f0ff"/><stop offset=".55" stop-color="#62c8ff"/><stop offset="1" stop-color="#3b8cff"/></linearGradient>
+    <linearGradient id="vgold" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d7b36a" stop-opacity="0"/><stop offset=".5" stop-color="#f0d394"/><stop offset="1" stop-color="#d7b36a" stop-opacity="0"/></linearGradient>
+    <!-- VERONICA AI mark: two light beams meet in a core, inside an orbit -->
+    <symbol id="mark" viewBox="0 0 48 48">
+      <circle cx="24" cy="24" r="22" fill="none" stroke="url(#vg)" stroke-width="1.2" opacity=".55"/>
+      <g class="orb"><path d="M24 2a22 22 0 0 1 19 11" fill="none" stroke="url(#vgold)" stroke-width="2.2" stroke-linecap="round"/></g>
+      <g class="orb2"><circle cx="24" cy="24" r="17" fill="none" stroke="#a9e3ff" stroke-opacity=".35" stroke-width=".8" stroke-dasharray="1.5 3"/></g>
+      <path d="M12.5 14.5 22 33.5" stroke="url(#vg)" stroke-width="3.2" stroke-linecap="round"/>
+      <path d="M35.5 14.5 26 33.5" stroke="url(#vg)" stroke-width="3.2" stroke-linecap="round"/>
+      <circle cx="24" cy="36" r="3.4" fill="#e9f8ff"/><circle cx="24" cy="36" r="6.5" fill="#62c8ff" opacity=".22"/>
+      <circle cx="24" cy="14" r="1.6" fill="#f0d394"/>
+    </symbol>
+  </defs>
+</svg>
+<div id="bgfx" aria-hidden="true"></div>
+
+<div class="app" id="app">
+  <header class="top" id="rail">
+    <div class="rhead">
+      <div class="brand"><svg class="logo"><use href="#mark"/></svg><b><span class="aiNm">VERONICA</span><span>AI</span></b></div>
+      <button class="rtog" id="railTog" type="button" title="Collapse menu  (Ctrl+B)" aria-label="Collapse or expand menu"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+    </div>
+    <div class="rscroll">
+    <div class="rlab">Menu</div>
+    <nav class="nav" aria-label="Main">
+      <button class="on" type="button" id="navAssist"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 9.5 12 16l3.5-6.5"/><circle cx="12" cy="12" r="1.2"/></svg><span>Assistant</span></button>
+      <button type="button" id="navReports"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 12h7M9 16h5"/></svg><span>Reports</span></button>
+      <button type="button" id="dashBtn"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="9" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="5" rx="1.5"/><rect x="13.5" y="11.5" width="7" height="9" rx="1.5"/><rect x="3.5" y="15.5" width="7" height="5" rx="1.5"/></svg><span>Dashboards</span></button>
+      <button type="button" id="histBtn"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4h4"/><path d="M12 8v4l3 2"/></svg><span>History</span></button>
+    </nav>
+    <div class="tright">
+      <div class="rlab">Look</div>
+      <div class="thwrap">
+        <button class="ritem thbtn" id="thBtn" type="button" title="Change look" aria-haspopup="true" aria-expanded="false"><i class="sw" id="thSw"></i><span>Theme</span><em id="thName">Aurora</em><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        <div class="seg" role="group" aria-label="Look"><button type="button" data-theme="aurora" class="on">Aurora</button><button type="button" data-theme="arc">Arc</button><button type="button" data-theme="holo">Holo</button><button type="button" data-theme="forge" title="Forge: solid 3D steel - spool taken apart and put back with its bill of materials, pipe bundle, coil reel, fittings, fighter jet with sonic boom">Forge</button><button type="button" data-theme="titan" title="Titan: blue blueprint hologram - pipes, tubes, fittings, spools · nuclear &amp; aerospace">Titan</button><button type="button" data-theme="atlas" title="Atlas: product hologram - explode / assemble the spool with your hands (admin &amp; manager)">Atlas</button></div>
+      </div>
+      <div class="rlab">Tools</div>
+      <button class="hb kbd ritem" id="kbdBtn" type="button" title="Arc keyboard" aria-label="Arc keyboard"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M6 10h.01M9.5 10h.01M13 10h.01M16.5 10h.01M7.5 14h9"/></svg><span>Keyboard</span></button>
+      <span class="sndwrap"><button class="hb bgm ritem" id="bgmBtn" type="button" title="Sound & screens" aria-label="Sound and screen settings" aria-haspopup="true"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></svg><span>Sound</span></button>
+        <div class="sndpop" id="sndPop" hidden role="dialog" aria-label="Sound and screens">
+          <b>Background music</b>
+          <div class="sseg"><button type="button" data-music="on" title="Plays while VERONICA is free, pauses while a task runs">When idle</button><button type="button" data-music="always" title="Keeps playing even while she works">Always</button><button type="button" data-music="off">Off</button></div>
+          <label class="stgl"><input type="checkbox" id="sfxTgl"><span>Screen sounds</span><em>packets, screen openings, typing</em></label>
+          <label class="stgl novaonly"><input type="checkbox" id="idleTgl"><span>Idle screens (Holo · Forge)</span><em>status, clock and month while nothing is running</em></label>
+        </div></span>
+      <button class="hb menu ritem" id="panelsBtn" type="button" aria-label="Insights" title="Insights"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V9M10 19V5M16 19v-7M21 19H3"/></svg><span>Insights</span></button>
+      <div class="rstat" title="ERP data status"><div class="pill"><i></i><span id="syncPill">Live · read-only</span></div><div class="clock" id="clock">--:--</div></div>
+      <div class="racct">
+        <button class="av" id="menuBtn" type="button" title="Account">··</button>
+        <div class="rwho"><b id="railName">…</b><small id="railRole"></small></div>
+        <button class="hb admb" id="admBtn" type="button" title="Admin console – users, roles, report access, security" aria-label="Admin console" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Admin</span></button>
+      </div>
+      <button class="rhide" id="railHide" type="button" title="Hide menu  (Ctrl+Shift+B)"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12s3.5-7 9-7 9 7 9 7-3.5 7-9 7-9-7-9-7z"/><circle cx="12" cy="12" r="2.5"/><path d="M4 4l16 16"/></svg><span>Hide menu</span></button>
+    </div>
+    </div>
+  </header>
+  <button class="rhandle" id="railHandle" type="button" title="Show menu  (Ctrl+B)" aria-label="Show menu"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+  <div class="rpeek" id="railPeek" aria-hidden="true"></div>
+
+  <aside class="col L" id="left" aria-hidden="true">
+    <section class="card hudc"><canvas class="hud" id="hudRadar"></canvas></section>
+    <section class="card hudc"><canvas class="hud" id="hudGlobe"></canvas></section>
+    <section class="card hudc"><canvas class="hud" id="hudWave"></canvas></section>
+  </aside>
+
+  <main class="center" id="center">
+    <div class="stage" id="stage" title="Tap to talk">
+      <canvas id="core3d"></canvas><canvas id="forgeStage" aria-hidden="true"></canvas><canvas id="holo" aria-hidden="true"></canvas>
+      <div class="hws" id="hws" aria-live="polite"><svg class="hlinks" id="hLinks"></svg><div class="hpanels" id="hPanels"></div><div class="hgauges" id="hGauges"></div></div>
+      <div class="arcwrap"><svg class="arc" viewBox="-170 -170 340 340" aria-hidden="true">
+        <defs><radialGradient id="acore" r="1"><stop offset="0" stop-color="#fff"/><stop offset=".3" stop-color="#d6f6ff"/><stop offset=".65" stop-color="#3fd8ff"/><stop offset="1" stop-color="#3fd8ff" stop-opacity="0"/></radialGradient>
+          <filter id="agl"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+        <g class="g4"><circle r="164" fill="none" stroke="rgba(159,240,255,.5)" stroke-width=".8" stroke-dasharray=".8 5.4"/></g>
+        <g class="g1" filter="url(#agl)"><circle class="gold" r="150" fill="none" stroke="#ffb547" stroke-width="3" stroke-dasharray="90 30 20 30 140 50 60 522"/></g>
+        <g class="g2" filter="url(#agl)"><circle class="cy" r="134" fill="none" stroke="#3fd8ff" stroke-width="7" stroke-dasharray="42 12" opacity=".55"/></g>
+        <g class="g3" filter="url(#agl)"><circle class="cy" r="118" fill="none" stroke="#3fd8ff" stroke-width="1.6" stroke-dasharray="200 30 80 30 260 30"/></g>
+        <g class="coils" filter="url(#agl)" stroke="#9ff0ff" stroke-width="1.1" fill="rgba(63,216,255,.14)">
+          <g id="coil"><path d="M -14 -100 L 14 -100 L 10 -76 L -10 -76 Z"/></g>
+          <use href="#coil" transform="rotate(36)"/><use href="#coil" transform="rotate(72)"/><use href="#coil" transform="rotate(108)"/><use href="#coil" transform="rotate(144)"/>
+          <use href="#coil" transform="rotate(180)"/><use href="#coil" transform="rotate(216)"/><use href="#coil" transform="rotate(252)"/><use href="#coil" transform="rotate(288)"/><use href="#coil" transform="rotate(324)"/>
+        </g>
+        <circle r="66" fill="rgba(4,24,48,.92)" stroke="rgba(159,240,255,.6)" stroke-width="1.4" filter="url(#agl)"/>
+        <polygon points="0,-46 40,23 -40,23" fill="none" stroke="#d6f6ff" stroke-width="2" filter="url(#agl)"/>
+        <g class="coreglow"><circle r="32" fill="url(#acore)"/><circle r="15" fill="#fff" opacity=".9" style="filter:blur(4px)"/></g>
+      </svg></div>
+      <button class="tap" id="talkBtn" type="button">🎙 Talk</button>
+      <div class="nm"><b class="aiNm">VERONICA</b><div class="state"><i></i><span id="aiState">Ready</span><span class="wv"><b></b><b></b><b></b><b></b><b></b></span></div></div>
+    </div>
+
+    <section class="chat" id="chat" aria-live="polite">
+      <div class="chathead">
+        <svg class="logo"><use href="#mark"/></svg>
+        <div style="min-width:0"><b class="aiNm">VERONICA</b><div class="who" id="who">…</div></div>
+        <div class="sp"></div>
+        <span class="muted dockonly" id="dockState" style="font-size:11.5px">Online</span>
+        <button class="hb" id="talkBtn2" type="button" title="Hands-free talk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+        <button class="hb" id="newBtn" type="button" title="New conversation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        <button class="hb popb" id="popBtn" type="button" title="Float as a small window"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><rect x="11" y="11" width="8" height="8" rx="1.5" fill="currentColor" stroke="none" opacity=".7"/></svg></button>
+        <button class="hb maxb" id="maxBtn" type="button" title="Maximise"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg></button>
+        <button class="hb restore" id="restoreBtn" type="button" title="Restore"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 14h6v6M20 10h-6V4M10 14l-7 7M14 10l7-7"/></svg></button>
+        <button class="hb dockonly" id="dockMax" type="button" title="Full window"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg></button>
+        <button class="hb" id="homeBtn" type="button" title="Minimise"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+      </div>
+      <div id="log"></div>
+    </section>
+
+    <div class="inputbar" id="inputbar">
+      <button class="stopbtn" id="stopBtn" type="button" title="Stop speaking (Esc)"><i></i>Stop</button>
+      <div id="talkbar" hidden><span class="eq"><i></i><i></i><i></i><i></i><i></i></span><b id="talkState">Listening…</b><span class="muted">speak naturally – pause when done</span><button class="tbtn" id="endTalk" type="button">End talk</button></div>
+      <div class="atts" id="atts" hidden aria-live="polite"></div>
+      <form id="f">
+        <button class="ib clip" id="clip" type="button" aria-label="Attach a file" title="Attach Excel, CSV, PDF, image or text (or drop / paste it here)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5 12.6 19.9a5.5 5.5 0 0 1-7.8-7.8L13.3 3.6a3.7 3.7 0 0 1 5.2 5.2l-8.4 8.4a1.8 1.8 0 0 1-2.6-2.6l7.8-7.8"/></svg></button>
+        <input type="file" id="fileIn" multiple hidden accept=".xlsx,.xlsm,.csv,.tsv,.pdf,.png,.jpg,.jpeg,.webp,.gif,.txt,.md,.json">
+        <button class="ib mic" id="mic" type="button" aria-label="Speak" title="Speak"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+        <textarea id="t" rows="1" placeholder="Ask VERONICA anything – or type / for reports" aria-label="Message"></textarea>
+        <select id="lang" aria-label="Language" title="Language">
+          <option value="en-IN">EN</option><option value="hi-IN">हिंदी</option><option value="mr-IN">मराठी</option><option value="gu-IN">ગુજરાતી</option><option value="raj-IN">राजस्थानी</option><option value="or-IN">ଓଡ଼ିଆ</option>
+        </select>
+        <button class="ib" id="spk" type="button" aria-pressed="false" aria-label="Speak replies aloud" title="Speak replies aloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path class="w" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg></button>
+        <button class="ib send" type="submit" aria-label="Send"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4 21 12 3.4 3.6v6.4l12.6 2-12.6 2z"/></svg></button>
+      </form>
+      <div class="hint">English · हिंदी · मराठी · ગુજરાતી · राजस्थानी · ଓଡ଼ିଆ · Esc stops her · / for reports</div>
+    </div>
+  </main>
+
+  <aside class="col R" aria-label="Activity and analysis">
+    <section class="card hudc hudR" aria-hidden="true"><canvas class="hud" id="hudNet"></canvas></section>
+    <div hidden><span id="actMeta"></span><div id="trace"></div></div>
+    <section class="card">
+      <div class="hd"><h3>Latest analysis</h3><span class="live">● live</span></div>
+      <div id="analysis"><div class="empty">Figures appear here the moment VERONICA reads them – each tagged with the report it came from.</div></div>
+    </section>
+    <section class="card trust">
+      <div class="sh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 4 9 9 10 5-1 9-5 9-10V6z"/><path d="m9 12 2 2 4-4"/></svg></div>
+      <div><b>Trusted by design</b>
+        <p>VERONICA reads your ERP replica in read-only mode and sees only what your role allows. She never changes data on her own.</p>
+        <ul><li>Every figure comes from a real query, with totals cross-checked</li><li>Private views stay locked for your role</li><li>Mails, schedules and new reports wait for your OK – and are logged</li></ul>
+      </div>
+    </section>
+  </aside>
+</div>
+
+<button class="fab" id="fab" type="button" aria-label="Chat with VERONICA" title="Chat with VERONICA"><svg class="logo"><use href="#mark"/></svg><span class="x">✕</span></button>
+<button class="fabTip" id="fabTip" type="button">👋 Hi, I'm <b>VERONICA</b> – tap to chat</button>
+
+<div class="dropzone" id="dropzone" aria-hidden="true"><div><b>Drop to attach</b><span>Excel · CSV · PDF · image · text – VERONICA reads it for your next question</span></div></div>
+<section class="dock" id="dock" hidden aria-label="VERONICA chat"><div class="dockbody" id="dockBody"></div></section>
+
+<div id="login"><form class="lc" id="loginForm" autocomplete="on">
+  <svg class="logo"><use href="#mark"/></svg>
+  <h2><span class="aiNm" id="loginName" style="color:inherit">VERONICA</span> <span>AI</span></h2>
+  <div class="muted" id="loginHint" style="text-align:center;margin-top:6px">Sign in with the username and password your admin gave you.</div>
+  <div id="pwFields">
+    <label class="lbl" for="user">Username</label><input id="user" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+    <label class="lbl" for="pass">Password</label><input id="pass" name="password" type="password" autocomplete="current-password" required>
+  </div>
+  <div id="tokFields" hidden><label class="lbl" for="tok">Access token</label><input id="tok" type="password" autocomplete="off"></div>
+  <div class="err" id="loginErr" role="alert"></div>
+  <button class="pbtn" id="loginBtn" type="submit">Sign in</button>
+  <figure class="lquote"><blockquote>“With great power comes great responsibility.”</blockquote></figure>
+
+</form></div>
+
+<dialog id="tblFull" aria-label="Table full view"><div class="dh"><b id="tfTitle">Table</b><button class="tbtn" type="button" onclick="tblFull.close()">Close</button></div><div class="tf" id="tfBody"></div></dialog>
+
+<dialog id="acct"><div class="dh"><b id="acctName">Account</b><button class="tbtn" type="button" onclick="acct.close()">Close</button></div>
+  <form class="db" id="pwForm">
+    <p class="muted" style="margin:8px 0">Change your password (at least 8 characters).</p>
+    <label class="lbl" for="oldpw">Current password</label><input class="inp" id="oldpw" type="password" autocomplete="current-password" required>
+    <label class="lbl" for="newpw">New password</label><input class="inp" id="newpw" type="password" autocomplete="new-password" minlength="8" required>
+    <div class="err" id="pwErr" role="alert"></div>
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="pbtn" style="width:auto;padding:9px 16px" type="submit">Change password</button><button class="tbtn" type="button" id="logoutBtn">Sign out</button></div>
+  </form>
+  <div class="db adminonly" id="themeAdminRow" hidden style="border-top:1px solid var(--line)">
+    <button class="tbtn" type="button" id="admOpen2">🛡️ Open Admin console</button></div>
+</dialog>
+<dialog id="admCon" class="adm" aria-label="Admin console">
+  <div class="admTop"><div class="admBrand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg><div><b>Admin Console</b><small>VERONICA AI · users, access &amp; security</small></div></div>
+    <div class="admTopR"><span class="admWho" id="admWho"></span><button class="admIco" type="button" id="admMode" title="Light / dark">☀</button><button class="admIco" type="button" id="admClose" title="Close (Esc)">✕</button></div></div>
+  <div class="admWrap">
+    <nav class="admNav" id="admNav" aria-label="Admin sections">
+      <button type="button" data-p="overview" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Overview</button>
+      <small>PEOPLE</small>
+      <button type="button" data-p="users"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6"/><path d="M17 4a4 4 0 010 8M22 21c0-3-1.5-5-4-5.6"/></svg>Users<em id="admNU"></em></button>
+      <button type="button" data-p="scope"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V10l6-4v4l6-4v4l6-4v15z"/><path d="M7 17h2M12 17h2M17 17h1"/></svg>Division &amp; plants</button>
+      <button type="button" data-p="looks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="8" cy="10" r="1.3"/><circle cx="12" cy="7.5" r="1.3"/><circle cx="16" cy="10" r="1.3"/><path d="M12 21a3 3 0 010-6h2"/></svg>Looks</button>
+      <small>ACCESS</small>
+      <button type="button" data-p="roles"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 6 6 1-4.5 4.3L17.5 20 12 17l-5.5 3 1-6.7L3 9l6-1z"/></svg>Roles &amp; data views</button>
+      <button type="button" data-p="reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Report access</button>
+      <small>AUDIT</small>
+      <button type="button" data-p="security"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z"/><path d="M12 8v4M12 15.5v.01"/></svg>Security log<em id="admNS"></em></button>
+    </nav>
+    <main class="admMain"><header class="admHd"><div><h2 id="admTitle">Overview</h2><p id="admSub"></p></div><div id="admTools"></div></header>
+      <div id="admMsg" role="status"></div><div id="admBody"></div></main>
+  </div>
+  <div class="admSheet" id="admSheet" hidden></div>
+</dialog>
+<dialog id="hist"><div class="dh"><b>Recent reports</b><button class="tbtn" type="button" onclick="hist.close()">Close</button></div><div class="db" id="histBody"></div></dialog>
+<dialog id="repDlg"><div class="dh"><b>Reports</b><button class="tbtn" type="button" onclick="repDlg.close()">Close</button></div>
+  <div class="db"><p class="muted" style="margin:6px 0 10px">Tap a report – then add a month, plant or "in Excel" if you like. Ask in any language.</p>
+    <div class="chips" id="skills"></div><h4 style="margin:18px 0 0;font-size:12px;letter-spacing:.14em;color:var(--mut)">RECENT</h4><div id="recent"><div class="empty">No reports yet.</div></div></div>
+</dialog>

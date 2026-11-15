@@ -1,0 +1,16 @@
+{
+  "name": "daily_sales",
+  "title": "Daily Sales Report",
+  "description": "Morning summary of yesterday's sales for management, branch-wise.",
+  "rules": "1. Period: yesterday by default; user may give a date or range.\n2. Use invoice date, not order date.\n3. Exclude cancelled / reversed invoices.\n4. Amounts are taxable value EXCLUDING GST, in ₹.\n5. Quantity in MT, rounded to 3 decimals.\n6. Credit notes of the same period are subtracted.",
+  "output_format": "Columns: Branch | Invoices | Qty (MT) | Taxable Amount (₹) | Avg Rate (₹/MT)\nSort by Taxable Amount descending. TOTAL row at the bottom (Invoices, Qty, Amount).\nBar chart: Taxable Amount by Branch.\nSummary (3-5 lines, user's language): total sale, top branch, comparison with the same day last week.",
+  "default_formats": [
+    "table",
+    "excel",
+    "pdf",
+    "chart"
+  ],
+  "sql_template": "-- Fill in after teaching: the agent writes and tests this from your schema.\n",
+  "example_output": "Branch | Invoices | Qty (MT) | Taxable Amount (₹) | Avg Rate (₹/MT)\nSurat | 14 | 182.450 | 1,24,56,300.00 | 68,272\nTOTAL | 31 | 401.200 | 2,71,80,000.00 | 67,747",
+  "allowed_roles": []
+}

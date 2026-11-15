@@ -1,0 +1,27 @@
+services:
+  reportbot:
+    build: .
+    env_file: .env
+    ports: ["8000:8000"]
+    volumes: ["reportbot_data:/data"]
+    restart: unless-stopped
+    # If MySQL runs on the same machine (not in Docker), use host.docker.internal in .env
+    extra_hosts: ["host.docker.internal:host-gateway"]
+
+  # Optional: n8n with the env vars the ReportBot workflow expects
+  n8n:
+    image: n8nio/n8n:latest
+    profiles: ["n8n"]          # start with:  docker compose --profile n8n up -d
+    ports: ["5678:5678"]
+    environment:
+      - REPORTBOT_URL=http://reportbot:8000
+      - REPORTBOT_API_KEY=${SERVICE_API_KEY}
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
+      - GENERIC_TIMEZONE=Asia/Kolkata
+      - WEBHOOK_URL=${N8N_PUBLIC_URL:-http://localhost:5678/}
+    volumes: ["n8n_data:/home/node/.n8n"]
+    restart: unless-stopped
+
+volumes:
+  reportbot_data:
+  n8n_data:

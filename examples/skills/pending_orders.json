@@ -1,0 +1,17 @@
+{
+  "name": "pending_orders",
+  "title": "Pending Sales Orders",
+  "description": "Open order book for sales & planning teams.",
+  "rules": "1. Orders with status Open or Partially Dispatched only.\n2. Pending Qty = Ordered Qty - Dispatched Qty; hide lines where Pending Qty <= 0.\n3. Ageing in days from order date to today.\n4. Flag orders older than 30 days as 'Delayed'.",
+  "output_format": "Columns: Order No | Order Date | Customer | Item/Size | Ordered (MT) | Dispatched (MT) | Pending (MT) | Age (days) | Status\nSort by Age descending. TOTAL for the three quantity columns.\nSummary: total pending MT, number of delayed orders, top 3 customers by pending quantity.",
+  "default_formats": [
+    "table",
+    "excel"
+  ],
+  "sql_template": "",
+  "example_output": "",
+  "allowed_roles": [
+    "admin",
+    "manager"
+  ]
+}

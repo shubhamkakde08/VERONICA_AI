@@ -1,0 +1,16 @@
+{
+ "name": "director_mis",
+ "title": "Director MIS (all reports analysed together: health by area, cross-department ratios, biggest changes)",
+ "description": "One page for the directors that reads every taught report for the period - order book, sales dispatch, final production / QC, scrap MIS, job-card scrap, issues / costing - and analyses them together. Use for: '/director_mis', 'director MIS', 'director dashboard', 'MD dashboard', 'management summary of all reports', 'overall company summary', 'sab reports ka summary', 'company ka haal'.",
+ "rules": "1. Call run_report_engine ONCE with skill_name director_mis. Default period = this month to date (it compares with the same days of the previous period, as each report does).\n2. It runs each area's own taught report with its own data checks - never re-calculate them with run_sql.\n3. Cross-department figures are ratios of two cards; say the formula when you quote one (e.g. book-to-bill = net booked MT / dispatch MT).\n4. An area that is not available (view not synced, no rows) is said plainly - never estimate it.\n5. Reply like a briefing for the director: 1 line overall, then the 3 biggest concerns and 2 wins with numbers, then one practical suggestion. Keep it short; the dashboard has the rest.",
+ "output_format": "Call run_report_engine ONCE. It delivers KPI cards, three tables (health by area, cross-department view, biggest changes) and the Director MIS dashboard (dark + light) by itself.",
+ "default_formats": [
+  "table",
+  "dashboard"
+ ],
+ "sql_template": "{\n \"engine\": \"director_mis\",\n \"formats\": [\n  \"table\",\n  \"dashboard\",\n  \"pdf\"\n ]\n}",
+ "example_output": "Director MIS 01-Nov to 02-Nov: 6 of 6 areas read. Needs attention: Scrap MIS (seamless scrap +0.8 pts). Book-to-bill 1.24x (booked 4,210 MT vs dispatched 3,395 MT). Wins: on-time delivery +4 pts, issue value -6%.",
+ "allowed_roles": [
+  "director"
+ ]
+}

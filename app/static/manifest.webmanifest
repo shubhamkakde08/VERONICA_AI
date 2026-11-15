@@ -1,0 +1,25 @@
+{
+ "name": "VERONICA AI",
+ "short_name": "VERONICA",
+ "start_url": "/?view=full",
+ "scope": "/",
+ "display": "standalone",
+ "orientation": "portrait",
+ "background_color": "#02060d",
+ "theme_color": "#02060d",
+ "description": "VERONICA - Venus reports assistant",
+ "icons": [
+  {
+   "src": "/icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any maskable"
+  },
+  {
+   "src": "/icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any maskable"
+  }
+ ]
+}

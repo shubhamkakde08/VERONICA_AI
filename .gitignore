@@ -1,0 +1,32 @@
+# --- secrets: never commit ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+users.xlsx
+knowledge/people.md
+knowledge/masters/private/
+# --- local runtime ---
+.venv/
+venv/
+logs/
+output/
+*.db
+*.sqlite3
+__pycache__/
+*.pyc
+.pytest_cache/
+*.bak*
+voice_test*.mp3
+# --- big / downloadable (see README) ---
+models/kokoro/*.onnx
+models/kokoro/*.bin
+setup/kokoro/
+cloudflared*.exe
+# --- data dumps: never commit company data ---
+*.sql
+*.sql.gz
+deploy/server/db_export/
+deploy/server/*.zip
+!sql/*.sql

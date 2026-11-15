@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Costing Intelligence</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+(function(){var t=null;try{t=localStorage.getItem('cid-theme')}catch(e){}
+if(t!=='light'&&t!=='dark')t=window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';
+document.documentElement.setAttribute('data-theme',t)})();
+</script>
+<style>
+:root{--r:14px;--font:"Inter","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+:root[data-theme=dark]{--bg:#0b0f17;--s1:#121826;--s2:#182033;--s3:#1e2840;--line:#263049;--tx:#e8ecf4;--mu:#8d97ad;--acc:#f2a93b;--acc-ink:#1a1206;--acc2:#3cc6b8;--pos:#34c77b;--neg:#f0566a;--hm:242,169,59;--sh:0 10px 30px #00000055;color-scheme:dark}
+:root[data-theme=light]{--bg:#f3f0e9;--s1:#ffffff;--s2:#f8f6f1;--s3:#eeeae0;--line:#e2dccf;--tx:#1b2130;--mu:#667085;--acc:#c27408;--acc-ink:#ffffff;--acc2:#0f8a7f;--pos:#13854f;--neg:#cf3044;--hm:194,116,8;--sh:0 1px 2px #1b213012,0 8px 24px #1b21300f;color-scheme:light}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:var(--font);background:var(--bg);color:var(--tx);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
+button,input,select{font:inherit;color:inherit}
+[hidden]{display:none!important}
+.mut{color:var(--mu)}
+.ico{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* header */
+.top{position:sticky;top:0;z-index:60;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-in{max-width:1600px;margin:auto;padding:12px 20px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.brand{display:flex;gap:12px;align-items:center;min-width:0}
+.mark{width:36px;height:36px;border-radius:10px;background:var(--acc);color:var(--acc-ink);display:grid;place-items:center;font-weight:800;font-size:18px;flex:none}
+.brand h1{margin:0;font-size:16px;letter-spacing:-.01em}
+.brand p{margin:0;font-size:12px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:52vw}
+.ctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.seg{display:inline-flex;background:var(--s2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:none;padding:5px 11px;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--mu)}
+.seg button:hover{color:var(--tx)}
+.seg button.on{background:var(--s1);color:var(--tx);box-shadow:0 1px 3px #0003}
+.btn{border:1px solid var(--line);background:var(--s1);border-radius:10px;padding:7px 12px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;gap:7px;align-items:center;white-space:nowrap}
+.btn:hover{border-color:var(--mu)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:var(--acc-ink)}
+.btn.sm{padding:4px 10px;font-size:12px}
+.link{border:0;background:none;color:var(--acc);cursor:pointer;font-size:12px;font-weight:600;padding:3px 4px}
+
+/* empty */
+.empty{max-width:760px;margin:9vh auto;padding:0 16px}
+.drop{border:1.5px dashed var(--line);border-radius:22px;background:var(--s1);padding:56px 28px;text-align:center;box-shadow:var(--sh);transition:.2s}
+.drop.h{border-color:var(--acc);background:var(--s2)}
+.drop .big{width:54px;height:54px;border-radius:16px;background:rgba(var(--hm),.15);color:var(--acc);display:inline-grid;place-items:center}
+.drop .big .ico{width:26px;height:26px}
+.drop h2{margin:16px 0 6px;font-size:22px;letter-spacing:-.01em}
+.drop p{color:var(--mu);margin:0 0 22px}
+.cols{margin-top:22px;font-size:12px;color:var(--mu);line-height:2}
+.cols code{background:var(--s2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;margin:0 2px;font-size:11px}
+
+/* app */
+.app{max-width:1600px;margin:auto;padding:16px 20px 60px}
+.filters{background:var(--s1);border:1px solid var(--line);border-radius:var(--r);padding:12px 12px 10px;box-shadow:var(--sh);margin-bottom:6px}
+.fl{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.dd{position:relative}
+.dd .lb{font-size:10.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;margin:0 0 4px 2px;font-weight:700}
+.dd>button{width:168px;display:flex;justify-content:space-between;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--line);border-radius:9px;padding:7px 10px;cursor:pointer;font-size:13px;text-align:left}
+.dd>button span{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.dd>button.act{border-color:var(--acc);box-shadow:0 0 0 3px rgba(var(--hm),.18)}
+.pn{display:none;position:absolute;top:calc(100% + 6px);left:0;width:360px;max-width:calc(100vw - 32px);background:var(--s1);border:1px solid var(--line);border-radius:12px;box-shadow:0 18px 44px #0006;z-index:70;padding:8px}
+.dd.open .pn{display:block}
+.pn input[type=search]{width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--s2);margin-bottom:8px;outline:none}
+.pn input[type=search]:focus{border-color:var(--acc)}
+.pn.r{left:auto;right:0}
+.pn .ac{display:flex;gap:10px;font-size:12px;margin:0 2px 4px;align-items:center}
+.pn .ac a{color:var(--acc);cursor:pointer;font-weight:600}
+.pn .ac span{margin-left:auto}
+.ls{max-height:260px;overflow:auto}
+.ls{border-top:1px solid var(--line);padding-top:4px}
+.ls label{display:grid;grid-template-columns:16px minmax(0,1fr) auto;gap:10px;align-items:center;padding:7px 8px;border-radius:7px;cursor:pointer;font-size:13px;line-height:1.3;text-align:left}
+.ls label:hover{background:var(--s2)}
+.ls label span{word-break:break-word}
+.ls label.on{background:rgba(var(--hm),.13)}
+.ls label.on span{font-weight:600}
+.ls label em{margin-left:auto;font-style:normal;color:var(--mu);font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ls label.z{opacity:.45}
+.ls input[type=checkbox]{width:15px;height:15px;margin:0;accent-color:var(--acc);cursor:pointer}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;align-items:center;min-height:24px;font-size:12px}
+.chip{background:rgba(var(--hm),.13);border:1px solid rgba(var(--hm),.35);border-radius:999px;padding:2px 4px 2px 10px;font-size:12px;display:inline-flex;gap:6px;align-items:center;max-width:320px}
+.chip b{font-weight:600;color:var(--mu)}
+.chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip button{border:0;background:none;cursor:pointer;color:var(--mu);font-size:15px;line-height:1;padding:0 4px}
+.chip button:hover{color:var(--neg)}
+
+.nav{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:10px 0 16px;overflow-x:auto;position:sticky;top:61px;z-index:30;background:var(--bg)}
+.nav button{border:0;background:none;padding:11px 14px;font-weight:600;color:var(--mu);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;margin-bottom:-1px}
+.nav button:hover{color:var(--tx)}
+.nav button.on{color:var(--tx);border-color:var(--acc)}
+.nav .cnt{font-size:11px;background:var(--s2);border:1px solid var(--line);border-radius:999px;padding:0 6px;margin-left:5px;color:var(--mu)}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,205px),1fr));gap:12px;margin-bottom:14px}
+.k{background:var(--s1);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);min-width:0}
+.k.hero{background:linear-gradient(135deg,rgba(var(--hm),.20),rgba(var(--hm),.04));border-color:rgba(var(--hm),.45)}
+.k .t{font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.k .v{font-size:25px;font-weight:750;margin:6px 0 2px;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.k .s{font-size:12px;color:var(--mu)}
+.up{color:var(--neg);font-weight:700}.dn{color:var(--pos);font-weight:700}
+
+.ins{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:10px;margin-bottom:16px}
+.ins div{background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:11px 14px;font-size:13px;display:flex;gap:11px;align-items:flex-start}
+.ins i{font-style:normal;width:24px;height:24px;flex:none;border-radius:7px;background:rgba(var(--hm),.16);color:var(--acc);display:grid;place-items:center;font-size:12px;font-weight:800}
+.ins i.w{background:color-mix(in srgb,var(--neg) 16%,transparent);color:var(--neg)}
+
+.g{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:12px;margin-bottom:12px}
+.c{background:var(--s1);border:1px solid var(--line);border-radius:var(--r);padding:14px;box-shadow:var(--sh);min-width:0}
+.hd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.hd h3{margin:0;font-size:14px}
+.hd small{color:var(--mu);font-size:11.5px}
+.w12{grid-column:span 12}.w8{grid-column:span 8}.w6{grid-column:span 6}.w4{grid-column:span 4}
+.cv{position:relative;height:290px}
+.cv.t{height:360px}
+
+.tb{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.tb input[type=search],.tb select{background:var(--s2);border:1px solid var(--line);border-radius:9px;padding:7px 10px;outline:none}
+.tb input[type=search]{min-width:260px;flex:0 1 340px}
+.tb input:focus,.tb select:focus{border-color:var(--acc)}
+.tb label{font-size:12px;color:var(--mu);display:flex;gap:6px;align-items:center}
+
+.tw{overflow:auto;max-height:620px;border:1px solid var(--line);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{position:sticky;top:0;background:var(--s3);color:var(--mu);font-size:11px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;text-align:left;padding:9px 10px;white-space:nowrap;z-index:2}
+th[data-k]{cursor:pointer;user-select:none}
+th[data-k]:hover{color:var(--tx)}
+th.s{color:var(--acc)}
+td{padding:8px 10px;border-top:1px solid var(--line);white-space:nowrap}
+th.n,td.n{text-align:right;font-variant-numeric:tabular-nums}
+td.wr{white-space:normal;min-width:220px}
+td.w2{white-space:normal;min-width:140px;max-width:230px}
+td.bc{width:140px;min-width:100px}
+tbody tr:hover td{background:var(--s2)}
+tr.clk{cursor:pointer}
+tfoot td{font-weight:750;background:var(--s3);position:sticky;bottom:0;z-index:1}
+.bar{height:6px;border-radius:3px;background:var(--acc);min-width:2px}
+.tag{font-size:11px;color:var(--mu);background:var(--s2);border:1px solid var(--line);border-radius:5px;padding:0 5px;margin-left:6px}
+.pg{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:10px;font-size:12px;color:var(--mu)}
+.hm td.n{color:var(--tx)}
+.hm th{text-transform:none;letter-spacing:0;font-size:11.5px;white-space:normal;vertical-align:bottom;min-width:96px;max-width:170px;line-height:1.25;word-break:break-word}
+.hm th:first-child,.hm td:first-child{position:sticky;left:0;min-width:200px;max-width:300px;white-space:normal;text-align:left;box-shadow:1px 0 0 var(--line)}
+.hm th:first-child{z-index:4;background:var(--s3)}
+.hm tbody td:first-child{background:var(--s1);z-index:1}
+.hm tbody tr:hover td:first-child{background:var(--s2)}
+.hm tfoot td:first-child{background:var(--s3);z-index:3}
+.xb{border:1px solid var(--line);background:var(--s2);border-radius:8px;padding:4px 9px;font-size:11.5px;font-weight:600;cursor:pointer;display:inline-flex;gap:5px;align-items:center;color:var(--mu);white-space:nowrap}
+.xb:hover{color:var(--acc);border-color:var(--acc)}
+.xb:disabled{opacity:.6;cursor:wait}
+.xb .ico{width:13px;height:13px}
+.xb.push{margin-left:auto}
+.hd .xr{display:flex;gap:10px;align-items:center;margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
+.vh{display:flex;align-items:center;gap:12px;margin:0 0 12px;flex-wrap:wrap}
+.vh h2{margin:0;font-size:17px;letter-spacing:-.01em}
+.drill{border-top:1px dashed var(--line);margin-top:6px;padding-top:18px}
+.drill .vh h2 span{color:var(--acc)}
+.hm td.z{color:var(--mu)}
+.pill{display:inline-block;padding:1px 7px;border-radius:999px;font-size:11.5px;font-weight:700}
+.pill.hi{background:color-mix(in srgb,var(--neg) 16%,transparent);color:var(--neg)}
+.pill.md{background:rgba(var(--hm),.16);color:var(--acc)}
+.note{font-size:12px;color:var(--mu);margin:10px 2px 0}
+
+@media(max-width:1050px){.w8,.w6,.w4{grid-column:span 12}}
+@media(max-width:640px){
+ .top-in{padding:10px 16px}.app{padding:12px 16px 40px}
+ .brand p{max-width:80vw}
+ .dd{flex:1 1 calc(50% - 8px)}.dd>button{width:100%}
+ .k .v{font-size:21px}
+ .tb input[type=search]{min-width:0;flex:1 1 100%}
+ .nav{top:0;position:static}
+ .btn .lbl{display:none}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+ <div class="brand"><div class="mark">₹</div><div><h1>Costing Intelligence</h1><p id="sub">Store-issue cost analysis · upload an ERP export</p></div></div>
+ <div class="ctl">
+  <div class="seg" id="unit" title="Value unit">
+   <button data-u="1">₹</button><button data-u="1000">K</button><button data-u="100000" class="on">Lakh</button><button data-u="10000000">Cr</button>
+  </div>
+  <button class="btn" id="th" title="Switch dark / light theme"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg><span class="lbl">Theme</span></button>
+  <button class="btn" id="ex" hidden title="Download filtered report as Excel"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14"/></svg><span class="lbl">Excel</span></button>
+  <label class="btn pri" title="Upload Excel / CSV"><svg class="ico" viewBox="0 0 24 24"><path d="M12 21V9m0 0-4 4m4-4 4 4M5 3h14"/></svg><span class="lbl">Upload</span><input id="f" type="file" accept=".xlsx,.xls,.csv" hidden></label>
+ </div>
+</div></header>
+
+<section class="empty" id="empty">
+ <div class="drop" id="drop">
+  <div class="big"><svg class="ico" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg></div>
+  <h2>Drop your costing export here</h2>
+  <p>Excel (.xlsx / .xls) or CSV. First sheet is read; columns matched by header name.</p>
+  <div class="ctl" style="justify-content:center">
+   <label class="btn pri">Choose file<input id="f2" type="file" accept=".xlsx,.xls,.csv" hidden></label>
+   <button class="btn" id="smp">Try with sample data</button>
+  </div>
+  <div class="cols">Expected columns:
+   <code>VRDATE</code><code>VRNO</code><code>DEPT_NAME</code><code>PLANT_NAME</code><code>DIV_CODE</code><code>ITEM_GROUP</code><code>COST_NAME</code><code>EQPT_NAME</code><code>ITEM_CODE</code><code>ITEM_NAME</code><code>UM</code><code>QTY_ISSUED</code><code>VAL_ISSUED</code><code>RATE</code><code>BATCH_NO</code>
+  </div>
+ </div>
+</section>
+
+<main class="app" id="app" hidden>
+ <section class="filters"><div class="fl" id="fl"></div><div class="chips" id="chips"></div></section>
+
+ <nav class="nav" id="nav">
+  <button data-v="overview">Overview</button>
+  <button data-v="plants">Plants</button>
+  <button data-v="breakdown">Breakdown</button>
+  <button data-v="items">Items</button>
+  <button data-v="rate">Rate variance<span class="cnt" id="rv-cnt">0</span></button>
+  <button data-v="matrix">Matrix</button>
+  <button data-v="data">Data<span class="cnt" id="dt-cnt">0</span></button>
+ </nav>
+
+ <section class="view" id="v-overview">
+  <div class="vh" data-x="summary"><h2>Overview</h2><small class="mut">KPIs and insights for current filter</small></div>
+  <div class="kpis" id="kp"></div>
+  <div class="ins" id="ins"></div>
+  <div class="g">
+   <div class="c w8" data-x="dim:MK"><div class="hd"><h3>Monthly cost trend</h3><small>Bars = value · line = transactions · click month to filter</small></div><div class="cv"><canvas id="c-trend"></canvas></div></div>
+   <div class="c w4" data-x="dim:PLANT_NAME"><div class="hd"><h3>Plant share</h3><small>Click slice to filter</small></div><div class="cv"><canvas id="c-plant"></canvas></div></div>
+   <div class="c w6" data-x="dim:DEPT_NAME"><div class="hd"><h3>Top 10 departments</h3><small>Click bar to filter</small></div><div class="cv"><canvas id="c-dept"></canvas></div></div>
+   <div class="c w6" data-x="dim:COST_NAME"><div class="hd"><h3>Top 10 cost centres</h3><small>Click bar to filter</small></div><div class="cv"><canvas id="c-cc"></canvas></div></div>
+   <div class="c w4" data-x="dim:ITEM_GROUP"><div class="hd"><h3>Item group share</h3><small>Click slice to filter</small></div><div class="cv"><canvas id="c-ig"></canvas></div></div>
+   <div class="c w8" data-x="dim:EQPT_NAME"><div class="hd"><h3>Top 10 equipment</h3><small>Click bar to filter</small></div><div class="cv"><canvas id="c-eq"></canvas></div></div>
+  </div>
+ </section>
+
+ <section class="view" id="v-plants" hidden>
+  <div class="vh" data-x="plants"><h2>Plant-wise analysis</h2><small class="mut" id="pl-sub"></small></div>
+  <div class="kpis" id="pl-kp"></div>
+  <div class="c" data-x="plcmp" style="margin-bottom:12px"><div class="hd"><h3>Plant comparison</h3><small>Click row to drill down · click header to sort</small></div><div id="t-pl"></div></div>
+  <div class="g">
+   <div class="c w6" data-x="mx:PLANT_NAME:MK"><div class="hd"><h3>Monthly cost by plant</h3><small>Stacked · top 6 plants</small></div><div class="cv t"><canvas id="c-plmo"></canvas></div></div>
+   <div class="c w6" data-x="mx:PLANT_NAME:ITEM_GROUP"><div class="hd"><h3>Item group mix by plant</h3><small>% of plant value · click bar to drill</small></div><div class="cv t"><canvas id="c-plig"></canvas></div></div>
+  </div>
+  <section class="drill" id="pl-drill">
+   <div class="vh"><h2>Drill-down: <span id="pl-dt"></span></h2></div>
+   <div class="tb"><label>Plant <select id="pl-sel"></select></label><button class="btn sm" id="pl-f">Apply as filter</button></div>
+   <div class="kpis" id="pl-dkp"></div>
+   <div class="g">
+    <div class="c w6" data-x="pl:DEPT_NAME"><div class="hd"><h3>Departments</h3><small>Top 10 · click to filter</small></div><div class="cv"><canvas id="c-pld"></canvas></div></div>
+    <div class="c w6" data-x="pl:ITEM_GROUP"><div class="hd"><h3>Item groups</h3><small>Top 10 · click to filter</small></div><div class="cv"><canvas id="c-plg"></canvas></div></div>
+    <div class="c w6" data-x="pl:COST_NAME"><div class="hd"><h3>Cost centres</h3><small>Top 10 · click to filter</small></div><div class="cv"><canvas id="c-plc"></canvas></div></div>
+    <div class="c w6" data-x="pl:EQPT_NAME"><div class="hd"><h3>Equipment</h3><small>Top 10 · click to filter</small></div><div class="cv"><canvas id="c-ple"></canvas></div></div>
+   </div>
+   <div class="c" data-x="pl:items"><div class="hd"><h3>Top 50 items in plant</h3><small>Export gives all items</small></div><div id="t-pli"></div></div>
+  </section>
+ </section>
+
+ <section class="view" id="v-breakdown" hidden>
+  <div class="tb"><div class="seg" id="bd-seg"></div></div>
+  <div class="g"><div class="c w12" data-x="bd"><div class="hd"><h3 id="bd-t">Breakdown</h3><small>Top 15 · click bar to filter</small></div><div class="cv"><canvas id="c-bd"></canvas></div></div></div>
+  <div class="c" data-x="bd"><div class="hd"><h3 id="bd-t2">Table</h3><small>Click row to filter</small></div><div id="t-bd"></div></div>
+ </section>
+
+ <section class="view" id="v-items" hidden>
+  <div class="g"><div class="c w12" data-x="items"><div class="hd"><h3>Pareto — top 30 items</h3><small id="par-s"></small></div><div class="cv t"><canvas id="c-par"></canvas></div></div></div>
+  <div class="c" data-x="items">
+   <div class="tb"><input type="search" id="it-q" placeholder="Search item code, name or group…"><span class="mut" id="it-n" style="font-size:12px"></span></div>
+   <div id="t-it"></div>
+  </div>
+ </section>
+
+ <section class="view" id="v-rate" hidden>
+  <div class="kpis" id="rv-kp"></div>
+  <div class="g"><div class="c w12" data-x="rv"><div class="hd"><h3>Biggest excess over minimum rate</h3><small>Σ (line rate − min rate) × qty</small></div><div class="cv"><canvas id="c-rv"></canvas></div></div></div>
+  <div class="c" data-x="rv">
+   <div class="tb"><input type="search" id="rv-q" placeholder="Search item…"><label>Min spread <select id="rv-th"><option value="0.05">5%</option><option value="0.1" selected>10%</option><option value="0.25">25%</option><option value="0.5">50%</option></select></label></div>
+   <div id="t-rv"></div>
+   <p class="note">Same item issued at more than one rate within current filter. Excess = what was issued above the lowest rate seen — a ceiling on savings, not a confirmed loss (rate differences can be valid: grade, size, vendor).</p>
+  </div>
+ </section>
+
+ <section class="view" id="v-matrix" hidden>
+  <div class="c" data-x="mx">
+   <div class="tb">
+    <label>Rows <select id="mx-r"></select></label>
+    <button class="btn sm" id="mx-sw" title="Swap rows and columns">⇄ Swap</button>
+    <label>Columns <select id="mx-c"></select></label>
+    <label>Measure <select id="mx-m"><option value="v">Value</option><option value="q">Qty</option><option value="n">Lines</option><option value="t">Transactions</option></select></label>
+    <label>Show <select id="mx-p"><option value="">Values</option><option value="row">% of row</option><option value="col">% of column</option><option value="tot">% of total</option></select></label>
+    <label>Columns shown <select id="mx-nc"><option value="10">Top 10</option><option value="15" selected>Top 15</option><option value="25">Top 25</option><option value="50">Top 50</option><option value="0">All</option></select></label>
+    <label>Rows shown <select id="mx-nr"><option value="25">Top 25</option><option value="50" selected>Top 50</option><option value="100">Top 100</option><option value="0">All</option></select></label>
+   </div>
+   <div id="t-mx"></div><p class="note" id="mx-n"></p>
+  </div>
+ </section>
+
+ <section class="view" id="v-data" hidden>
+  <div class="c" data-x="data">
+   <div class="tb"><input type="search" id="dt-q" placeholder="Search VRNO, item, department, plant…"><span class="mut" id="dt-n" style="font-size:12px"></span></div>
+   <div id="t-dt"></div>
+  </div>
+ </section>
+</main>
+
+<script>
+'use strict';
+/* ---------- constants & helpers ---------- */
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],MONU=MON.map(m=>m.toUpperCase());
+const DIMS=[['DEPT_NAME','Department'],['PLANT_NAME','Plant'],['MK','Month'],['DIV_CODE','Division'],['ITEM_GROUP','Item group'],['COST_NAME','Cost centre'],['EQPT_NAME','Equipment']];
+const LBL=Object.assign(Object.fromEntries(DIMS),{ITEM_CODE:'Item',UM:'Unit'});
+const BD=[['PLANT_NAME','Plant'],['DEPT_NAME','Department'],['ITEM_GROUP','Item group'],['COST_NAME','Cost centre'],['EQPT_NAME','Equipment'],['DIV_CODE','Division'],['MK','Month']];
+const TXT=['DEPT_NAME','PLANT_NAME','DIV_CODE','ITEM_GROUP','COST_NAME','EQPT_NAME','ITEM_CODE','ITEM_NAME','VRNO','UM','BATCH_NO'];
+const SUF={1:'',1000:' K',100000:' L',10000000:' Cr'},UN={1:'Rupees',1000:'Thousand',100000:'Lakhs',10000000:'Crore'};
+const S={all:[],rows:[],unit:1e5,sel:{},view:'overview',dim:'PLANT_NAME',mr:'DEPT_NAME',mc:'PLANT_NAME',sort:{},page:{},charts:{},file:'',M:null};
+
+const fv=v=>{const d=S.unit==1?0:2,a=Math.abs(v)/S.unit,neg=v<0&&a>=Math.pow(10,-d)/2;return (neg?'−':'')+'₹'+a.toLocaleString('en-IN',{minimumFractionDigits:d,maximumFractionDigits:d})+SUF[S.unit]};
+const fn=(v,d=2)=>(+v||0).toLocaleString('en-IN',{maximumFractionDigits:d});
+const pct=(a,b,d=1)=>b?(a/b*100).toFixed(d)+'%':'0%';
+const ml=k=>{const m=/^(\d{4})-(\d{2})$/.exec(k);return m?MON[+m[2]-1]+'-'+m[1].slice(2):k};
+const dv=(k,v)=>k==='MK'?ml(v):k==='ITEM_CODE'?((S.NM&&S.NM[v]||v)+' ['+v+']'):v;
+const trunc=(s,n)=>{s=String(s);return s.length>n?s.slice(0,n-1)+'…':s};
+const fmtD=d=>{d=new Date(d);return String(d.getDate()).padStart(2,'0')+'-'+MON[d.getMonth()]+'-'+d.getFullYear()};
+function num(x){if(typeof x==='number')return isFinite(x)?x:0;const n=parseFloat(String(x==null?'':x).replace(/[,₹\s]/g,''));return isNaN(n)?0:n}
+
+/* robust date parse: Excel serial, Date, yyyy-mm-dd, dd-mm-yyyy, dd/mm/yy, dd-MMM-yyyy */
+function pDate(v){
+ if(v instanceof Date)return isNaN(v)?null:new Date(v.getFullYear(),v.getMonth(),v.getDate());
+ if(typeof v==='number'){if(v>20000&&v<80000){const u=new Date(Math.round((v-25569)*864e5));return new Date(u.getUTCFullYear(),u.getUTCMonth(),u.getUTCDate())}return null}
+ const s=String(v==null?'':v).trim();if(!s)return null;
+ if(/^\d{5}(\.\d+)?$/.test(s))return pDate(+s);
+ let m=s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);
+ m=s.match(/^(\d{1,2})[-\/. ]([A-Za-z]{3,9}|\d{1,2})[-\/., ]+(\d{2,4})/);
+ if(m){const mo=/\d/.test(m[2])?+m[2]-1:MONU.indexOf(m[2].slice(0,3).toUpperCase());let y=+m[3];if(y<100)y+=2000;if(mo<0||mo>11)return null;return new Date(y,mo,+m[1])}
+ const d=new Date(s);return isNaN(d)?null:new Date(d.getFullYear(),d.getMonth(),d.getDate());
+}
+function norm(o){
+ const r={};for(const k in o){const v=o[k];r[String(k).trim().toUpperCase().replace(/[\s.]+/g,'_')]=typeof v==='string'?v.trim():v}
+ r.D=pDate(r.VRDATE);
+ r.MK=r.D?r.D.getFullYear()+'-'+String(r.D.getMonth()+1).padStart(2,'0'):(r.VR_MONTH!==''&&r.VR_MONTH!=null?String(r.VR_MONTH):'(no date)');
+ r.V=num(r.VAL_ISSUED);r.Q=num(r.QTY_ISSUED);r.R=num(r.RATE);if(!r.R&&r.Q)r.R=r.V/r.Q;
+ TXT.forEach(k=>{r[k]=r[k]===''||r[k]==null?'(blank)':String(r[k])});
+ r._s=[r.VRNO,r.ITEM_CODE,r.ITEM_NAME,r.ITEM_GROUP,r.DEPT_NAME,r.PLANT_NAME,r.COST_NAME,r.EQPT_NAME].join(' ').toLowerCase();
+ return r;
+}
+
+/* ---------- theme / unit ---------- */
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);try{localStorage.setItem('cid-theme',t)}catch(e){}if(S.M)drawView()}
+$('#th').onclick=()=>setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+$('#unit').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.unit=+b.dataset.u;$$('#unit button').forEach(x=>x.classList.toggle('on',x===b));if(S.M){labels();drawView()}};
+
+/* ---------- loading ---------- */
+function load(file){
+ if(!file)return;const csv=/\.csv$/i.test(file.name),rd=new FileReader();
+ rd.onload=e=>{try{
+  const wb=XLSX.read(e.target.result,{type:'array',raw:csv});
+  const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:'',raw:true});
+  if(!json.length){alert('No rows found in first sheet.');return}
+  start(json.map(norm),file.name);
+ }catch(err){alert('Could not read file: '+err.message)}};
+ rd.readAsArrayBuffer(file);
+}
+$('#f').onchange=e=>{load(e.target.files[0]);e.target.value=''};
+$('#f2').onchange=e=>{load(e.target.files[0]);e.target.value=''};
+const dz=$('#drop');
+dz.ondragover=e=>{e.preventDefault();dz.classList.add('h')};dz.ondragleave=()=>dz.classList.remove('h');
+dz.ondrop=e=>{e.preventDefault();dz.classList.remove('h');load(e.dataTransfer.files[0])};
+document.addEventListener('dragover',e=>e.preventDefault());
+document.addEventListener('drop',e=>{e.preventDefault();if(e.dataTransfer.files[0]&&!e.target.closest('#drop'))load(e.dataTransfer.files[0])});
+
+function start(rows,name){
+ S.all=rows;S.file=name;S.sort={};S.page={};S.pl=null;S.NM={};rows.forEach(r=>S.NM[r.ITEM_CODE]=r.ITEM_NAME);DIMS.forEach(([k])=>S.sel[k]=new Set());
+ $('#empty').hidden=true;$('#app').hidden=false;$('#ex').hidden=false;
+ let mn=Infinity,mx=-Infinity;rows.forEach(r=>{if(r.D){const t=+r.D;if(t<mn)mn=t;if(t>mx)mx=t}});
+ $('#sub').textContent=name+' · '+rows.length.toLocaleString('en-IN')+' lines'+(isFinite(mn)?' · '+fmtD(mn)+' – '+fmtD(mx):'');
+ ['#it-q','#rv-q','#dt-q'].forEach(s=>$(s).value='');
+ buildSlicers();buildMatrixSel();render();
+}
+
+/* ---------- slicers (cascading) ---------- */
+function pass(r,skip){for(const [k] of DIMS){if(k===skip)continue;const s=S.sel[k];if(s.size&&!s.has(r[k]))return false}return true}
+function closeAll(){$$('.dd.open').forEach(d=>d.classList.remove('open'))}
+document.addEventListener('click',e=>{if(!e.target.closest('.dd'))closeAll()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
+
+function buildSlicers(){
+ const box=$('#fl');box.innerHTML='';
+ DIMS.forEach(([k,l])=>{
+  const d=document.createElement('div');d.className='dd';d.dataset.k=k;
+  d.innerHTML=`<div class="lb">${l}</div><button type="button"><span>All</span><svg class="ico" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+  <div class="pn"><input type="search" placeholder="Search ${l.toLowerCase()}…"><div class="ac"><a data-a="all">Select shown</a><a data-a="clr">Clear</a><span class="mut" data-c></span></div><div class="ls"></div></div>`;
+  const btn=d.querySelector('button'),inp=d.querySelector('input'),ls=d.querySelector('.ls');
+  btn.onclick=()=>{const o=d.classList.contains('open');closeAll();if(!o){const pn=d.querySelector('.pn');pn.classList.toggle('r',d.getBoundingClientRect().left+370>window.innerWidth);d._top=new Set(S.sel[k]);d.classList.add('open');inp.value='';drawList(d);ls.scrollTop=0;inp.focus()}};
+  inp.oninput=()=>drawList(d);
+  ls.onchange=e=>{const v=e.target.value;e.target.checked?S.sel[k].add(v):S.sel[k].delete(v);render();const st=ls.scrollTop;drawList(d);ls.scrollTop=st};
+  d.querySelector('[data-a=all]').onclick=()=>{(d._vis||[]).forEach(v=>S.sel[k].add(v));drawList(d);render()};
+  d.querySelector('[data-a=clr]').onclick=()=>{S.sel[k].clear();drawList(d);render()};
+  box.appendChild(d);
+ });
+ const rb=document.createElement('button');rb.className='btn';rb.textContent='Reset all';rb.style.marginLeft='auto';
+ rb.onclick=()=>{DIMS.forEach(([k])=>S.sel[k].clear());render()};box.appendChild(rb);
+}
+function drawList(d){
+ const k=d.dataset.k,q=d.querySelector('input').value.toLowerCase(),m=new Map();
+ for(const r of S.all)if(pass(r,k))m.set(r[k],(m.get(r[k])||0)+r.V);
+ S.sel[k].forEach(v=>{if(!m.has(v))m.set(v,0)});
+ let o=[...m.entries()];
+ o.sort(k==='MK'?(a,b)=>a[0]<b[0]?-1:a[0]>b[0]?1:0:(a,b)=>b[1]-a[1]);
+ o=o.filter(([v])=>String(dv(k,v)).toLowerCase().includes(q));const tp=d._top||new Set;o=[...o.filter(x=>tp.has(x[0])),...o.filter(x=>!tp.has(x[0]))];d._vis=o.map(x=>x[0]);
+ d.querySelector('.ls').innerHTML=o.slice(0,600).map(([v,val])=>`<label class="${val?'':'z'}${S.sel[k].has(v)?' on':''}" title="${esc(dv(k,v))}"><input type="checkbox" value="${esc(v)}"${S.sel[k].has(v)?' checked':''}><span>${esc(dv(k,v))}</span><em>${fv(val)}</em></label>`).join('')||'<div class="mut" style="padding:8px">No match</div>';
+ d.querySelector('[data-c]').textContent=o.length+' option'+(o.length==1?'':'s');
+}
+function labels(){
+ $$('#fl .dd').forEach(d=>{const k=d.dataset.k,s=S.sel[k],b=d.querySelector('button');
+  b.firstElementChild.textContent=s.size?(s.size==1?dv(k,[...s][0]):s.size+' selected'):'All';b.classList.toggle('act',s.size>0)});
+}
+function chips(){
+ const a=[];DIMS.forEach(([k,l])=>S.sel[k].forEach(v=>a.push(`<span class="chip" title="${esc(l+': '+dv(k,v))}"><b>${l}</b><span>${esc(dv(k,v))}</span><button data-k="${k}" data-v="${esc(v)}" aria-label="Remove">×</button></span>`)));
+ $('#chips').innerHTML=a.length?a.join('')+'<button class="link" data-clr>Clear all</button>':'<span class="mut">No filters — all data shown. Click any bar, slice or table row to filter.</span>';
+}
+$('#chips').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-clr'))DIMS.forEach(([k])=>S.sel[k].clear());else S.sel[b.dataset.k].delete(b.dataset.v);render()};
+function toggleSel(k,v){if(!S.sel[k])return;S.sel[k].has(v)?S.sel[k].delete(v):S.sel[k].add(v);render()}
+
+/* ---------- compute ---------- */
+function grp(D,k){const m=new Map();for(const r of D){let x=m.get(r[k]);if(!x){x={k:r[k],v:0,q:0,t:new Set(),i:new Set(),n:0};m.set(r[k],x)}x.v+=r.V;x.q+=r.Q;x.t.add(r.VRNO);x.i.add(r.ITEM_CODE);x.n++}return [...m.values()].sort((a,b)=>b.v-a.v)}
+function compute(){
+ const D=S.rows;let T=0,Q=0;const vs=new Set();for(const r of D){T+=r.V;Q+=r.Q;vs.add(r.VRNO)}
+ const g={};['DEPT_NAME','PLANT_NAME','ITEM_GROUP','COST_NAME','EQPT_NAME','DIV_CODE','MK','ITEM_CODE'].forEach(k=>g[k]=grp(D,k));
+ const gm=g.MK.slice().sort((a,b)=>a.k<b.k?-1:a.k>b.k?1:0);
+ const nm={},ig={},um={};for(const r of D){nm[r.ITEM_CODE]=r.ITEM_NAME;ig[r.ITEM_CODE]=r.ITEM_GROUP;um[r.ITEM_CODE]=r.UM}
+ const rv={};
+ for(const r of D){if(r.R>0&&r.Q>0){let x=rv[r.ITEM_CODE];if(!x)x=rv[r.ITEM_CODE]={k:r.ITEM_CODE,mn:Infinity,mx:0,q:0,v:0,n:0,ex:0};
+  if(r.R<x.mn)x.mn=r.R;if(r.R>x.mx)x.mx=r.R;x.q+=r.Q;x.v+=r.R*r.Q;x.n++}}
+ for(const r of D){const x=rv[r.ITEM_CODE];if(x&&r.R>0&&r.Q>0)x.ex+=(r.R-x.mn)*r.Q}
+ const RVall=Object.values(rv).filter(x=>x.n>1&&x.mx>x.mn).map(x=>(x.avg=x.v/x.q,x.sp=x.mx/x.mn-1,x)).sort((a,b)=>b.ex-a.ex);
+ const RV=RVall.filter(x=>x.sp>0.1);
+ S.M={T,Q,V:vs.size,N:D.length,g,gm,nm,ig,um,RVall,RV,EX:RV.reduce((s,x)=>s+x.ex,0)};
+}
+
+/* ---------- main render ---------- */
+function render(){
+ S.rows=S.all.filter(r=>pass(r));S.page={};
+ labels();chips();compute();
+ $('#rv-cnt').textContent=S.M.RV.length.toLocaleString('en-IN');
+ $('#dt-cnt').textContent=S.M.N.toLocaleString('en-IN');
+ drawView();
+}
+$('#nav').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.view=b.dataset.v;drawView();window.scrollTo({top:Math.min(window.scrollY,$('#app').offsetTop),behavior:'smooth'})};
+function drawView(){
+ $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.view));
+ $$('.view').forEach(v=>v.hidden=v.id!=='v-'+S.view);
+ setChartDefaults();
+ ({overview:vOverview,plants:vPlants,breakdown:vBreak,items:vItems,rate:vRate,matrix:vMatrix,data:vData})[S.view]();
+}
+
+/* ---------- charts ---------- */
+function TC(){const cs=getComputedStyle(document.documentElement),g=n=>cs.getPropertyValue(n).trim();
+ return {mu:g('--mu'),line:g('--line'),tx:g('--tx'),acc:g('--acc'),acc2:g('--acc2'),s1:g('--s1'),
+  pal:[g('--acc'),g('--acc2'),'#6c8cff','#e0607e','#9b7bff','#58b4e8','#e8875b','#7fbf7f','#c9a0dc','#8a94a8']}}
+function setChartDefaults(){if(!window.Chart)return;const c=TC();Chart.defaults.color=c.mu;Chart.defaults.borderColor=c.line;Chart.defaults.font.family=getComputedStyle(document.body).fontFamily;Chart.defaults.font.size=11.5}
+function mk(id,cfg){if(S.charts[id])S.charts[id].destroy();const el=document.getElementById(id);if(!el||!window.Chart)return;S.charts[id]=new Chart(el,cfg)}
+const axV=c=>({ticks:{color:c.mu,callback:v=>(+v).toLocaleString('en-IN',{maximumFractionDigits:1})},grid:{color:c.line},border:{display:false},title:{display:true,text:UN[S.unit],color:c.mu,font:{size:10.5}}});
+const ptr=(e,el)=>{if(e.native&&e.native.target)e.native.target.style.cursor=el.length?'pointer':'default'};
+const tipV=t=>' '+fv(t.raw*S.unit)+' · '+pct(t.raw*S.unit,S.M.T);
+function topN(list,n){if(list.length<=n)return list;const t=list.slice(0,n-1),o=list.slice(n-1);return [...t,{k:'Others ('+o.length+')',v:o.reduce((s,x)=>s+x.v,0),other:true}]}
+
+function donut(id,list,k){
+ const c=TC(),d=topN(list,8),narrow=window.innerWidth<700;
+ mk(id,{type:'doughnut',data:{labels:d.map(x=>trunc(dv(k,x.k),24)),datasets:[{data:d.map(x=>x.v/S.unit),backgroundColor:c.pal,borderColor:c.s1,borderWidth:2,hoverOffset:6}]},
+  options:{maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:narrow?'bottom':'right',labels:{boxWidth:9,boxHeight:9,usePointStyle:true,color:c.tx,font:{size:11},padding:9}},
+   tooltip:{callbacks:{title:t=>dv(k,d[t[0].dataIndex].k),label:tipV}}},
+   onClick:(e,el)=>{if(el[0]){const x=d[el[0].index];if(!x.other)toggleSel(k,x.k)}},onHover:ptr}});
+}
+function hbar(id,list,k,n,opt={}){
+ const c=TC(),d=list.slice(0,n);
+ mk(id,{type:'bar',data:{labels:d.map(x=>trunc(opt.lab?opt.lab(x):dv(k,x.k),28)),datasets:[{data:d.map(x=>(opt.val?opt.val(x):x.v)/S.unit),backgroundColor:opt.color||c.acc,borderRadius:4,maxBarThickness:20}]},
+  options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false},
+   tooltip:{callbacks:{title:t=>opt.lab?opt.lab(d[t[0].dataIndex]):dv(k,d[t[0].dataIndex].k),label:opt.tip||tipV}}},
+   scales:{x:axV(c),y:{ticks:{color:c.tx,font:{size:11}},grid:{display:false},border:{display:false}}},
+   onClick:(e,el)=>{if(el[0]&&k)toggleSel(k,d[el[0].index].k)},onHover:k?ptr:undefined}});
+}
+function trend(){
+ const c=TC(),mo=S.M.gm;
+ mk('c-trend',{type:'bar',data:{labels:mo.map(x=>ml(x.k)),datasets:[
+  {type:'bar',label:'Value',data:mo.map(x=>x.v/S.unit),backgroundColor:c.acc,borderRadius:5,maxBarThickness:44,yAxisID:'y',order:2},
+  {type:'line',label:'Transactions',data:mo.map(x=>x.t.size),borderColor:c.acc2,backgroundColor:c.acc2,tension:.35,pointRadius:3,pointHoverRadius:5,yAxisID:'y1',order:1}]},
+  options:{maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+   plugins:{legend:{align:'end',labels:{color:c.tx,boxWidth:9,boxHeight:9,usePointStyle:true}},
+    tooltip:{callbacks:{label:t=>t.dataset.yAxisID==='y'?' Value: '+fv(t.raw*S.unit):' Transactions: '+fn(t.raw,0)}}},
+   scales:{x:{ticks:{color:c.mu},grid:{display:false}},y:axV(c),y1:{position:'right',ticks:{color:c.mu},grid:{display:false},border:{display:false},title:{display:true,text:'Txns',color:c.mu,font:{size:10.5}}}},
+   onClick:(e,el)=>{if(el[0])toggleSel('MK',mo[el[0].index].k)},onHover:ptr}});
+}
+function pareto(){
+ const c=TC(),M=S.M,it=M.g.ITEM_CODE,d=it.slice(0,30);let cum=0;const cp=d.map(x=>(cum+=x.v)/(M.T||1)*100);
+ mk('c-par',{type:'bar',data:{labels:d.map(x=>trunc(M.nm[x.k],18)),datasets:[
+  {type:'bar',label:'Value',data:d.map(x=>x.v/S.unit),backgroundColor:c.acc,borderRadius:3,yAxisID:'y',order:2},
+  {type:'line',label:'Cumulative %',data:cp,borderColor:c.acc2,backgroundColor:c.acc2,pointRadius:2,tension:.2,yAxisID:'y1',order:1}]},
+  options:{maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+   plugins:{legend:{align:'end',labels:{color:c.tx,boxWidth:9,boxHeight:9,usePointStyle:true}},
+    tooltip:{callbacks:{title:t=>{const x=d[t[0].dataIndex];return M.nm[x.k]+'  ['+x.k+']'},label:t=>t.dataset.yAxisID==='y'?' Value: '+fv(t.raw*S.unit):' Cumulative: '+t.raw.toFixed(1)+'%'}}},
+   scales:{x:{ticks:{color:c.mu,maxRotation:60,minRotation:45,font:{size:10}},grid:{display:false}},y:axV(c),
+    y1:{position:'right',min:0,max:100,ticks:{color:c.mu,callback:v=>v+'%'},grid:{display:false},border:{display:false}}}}});
+}
+
+/* ---------- generic sortable / paged table ---------- */
+function table(elId,cols,rows,opt={}){
+ const el=document.getElementById(elId),st=S.sort[elId]||(S.sort[elId]={k:opt.sk||null,d:opt.sd||-1});
+ let R=rows;
+ if(st.k){const c=cols.find(c=>c.k===st.k);if(c){const gv=c.sv||(r=>r[c.k]);R=rows.slice().sort((a,b)=>{const x=gv(a),y=gv(b);return (typeof x==='string'?x.localeCompare(y):(x>y?1:x<y?-1:0))*st.d})}}
+ const ps=opt.ps||50,total=R.length,pages=Math.max(1,Math.ceil(total/ps));let p=Math.min(S.page[elId]||0,pages-1);
+ if(opt.page)R=R.slice(p*ps,p*ps+ps);
+ const th=cols.map(c=>`<th class="${c.n?'n':''}${st.k===c.k?' s':''}"${c.ns?'':` data-k="${c.k}"`}>${c.h}${st.k===c.k?(st.d>0?' ↑':' ↓'):''}</th>`).join('');
+ const body=R.length?R.map(r=>`<tr${opt.row?` class="clk" data-v="${esc(opt.row(r))}" title="${opt.rt||'Click to filter'}"`:''}>${cols.map(c=>`<td class="${c.n?'n':''} ${c.cl||''}">${c.f?c.f(r):esc(r[c.k])}</td>`).join('')}</tr>`).join('')
+  :`<tr><td colspan="${cols.length}" class="mut" style="text-align:center;padding:22px">No rows</td></tr>`;
+ const foot=opt.foot?`<tfoot><tr>${opt.foot.map((x,i)=>`<td class="${cols[i]&&cols[i].n?'n':''}">${x}</td>`).join('')}</tr></tfoot>`:'';
+ const pager=opt.page&&total>ps?`<div class="pg"><span>${fn(p*ps+1,0)}–${fn(Math.min(total,p*ps+ps),0)} of ${fn(total,0)}</span><button class="btn sm" data-pg="${p-1}"${p?'':' disabled'}>‹ Prev</button><button class="btn sm" data-pg="${p+1}"${p<pages-1?'':' disabled'}>Next ›</button></div>`:'';
+ el.innerHTML=`<div class="tw"><table class="${opt.cls||''}"><thead><tr>${th}</tr></thead><tbody>${body}</tbody>${foot}</table></div>${pager}`;
+ el.onclick=e=>{
+  const h=e.target.closest('th[data-k]');if(h){const k=h.dataset.k;if(st.k===k)st.d*=-1;else{st.k=k;const c=cols.find(c=>c.k===k);st.d=c&&c.n?-1:1}S.page[elId]=0;table(elId,cols,rows,opt);return}
+  const pb=e.target.closest('[data-pg]');if(pb&&!pb.disabled){S.page[elId]=+pb.dataset.pg;table(elId,cols,rows,opt);el.querySelector('.tw').scrollTop=0;return}
+  const tr=e.target.closest('tr.clk');if(tr&&opt.onRow)opt.onRow(tr.dataset.v);
+ };
+}
+const barCell=mx=>r=>`<div class="bar" style="width:${Math.max(2,Math.abs(r.v)/(mx||1)*100).toFixed(1)}%"></div>`;
+
+/* ---------- views ---------- */
+function vOverview(){
+ const M=S.M,g=M.g,mo=M.gm,T=M.T,last=mo[mo.length-1],prev=mo[mo.length-2];
+ let dl=fn(M.N,0)+' lines';
+ if(last&&prev&&prev.v){const ch=(last.v-prev.v)/prev.v*100;dl=`<span class="${ch>0?'up':'dn'}">${ch>0?'▲':'▼'} ${Math.abs(ch).toFixed(1)}%</span> ${ml(last.k)} vs ${ml(prev.k)}`}
+ const it=g.ITEM_CODE,top10=it.slice(0,10).reduce((s,x)=>s+x.v,0);
+ let cum=0,n80=0;for(const x of it){cum+=x.v;n80++;if(cum>=T*.8)break}
+ const K=[['Total issue value',fv(T),dl,'hero'],
+  ['Transactions',fn(M.V,0),fv(M.V?T/M.V:0)+' avg / txn'],
+  ['Items consumed',fn(it.length,0),`${fn(n80,0)} items = 80% of value`],
+  ['Plants · Departments',g.PLANT_NAME.length+' · '+g.DEPT_NAME.length,g.COST_NAME.length+' cost centres'],
+  ['Top-10 item share',pct(top10,T),'value concentration'],
+  ['Rate excess',fv(M.EX),`${M.RV.length} items with >10% rate spread`]];
+ $('#kp').innerHTML=K.map(k=>`<div class="k ${k[3]||''}"><div class="t">${k[0]}</div><div class="v" title="${esc(String(k[1]))}">${k[1]}</div><div class="s">${k[2]}</div></div>`).join('');
+ $('#ins').innerHTML=insights(n80).map(([i,w,t])=>`<div><i class="${w?'w':''}">${i}</i><span>${t}</span></div>`).join('');
+ trend();donut('c-plant',g.PLANT_NAME,'PLANT_NAME');
+ hbar('c-dept',g.DEPT_NAME,'DEPT_NAME',10);hbar('c-cc',g.COST_NAME,'COST_NAME',10,{color:TC().acc2});
+ donut('c-ig',g.ITEM_GROUP,'ITEM_GROUP');hbar('c-eq',g.EQPT_NAME,'EQPT_NAME',10,{color:'#6c8cff'});
+}
+function insights(){
+ const M=S.M,g=M.g,T=M.T,I=[],nm=M.nm;let n80=0;{let c=0;for(const x of g.ITEM_CODE){c+=x.v;n80++;if(c>=T*.8)break}}
+ if(!M.N)return [['!',1,'No rows match current filters.']];
+ const d=g.DEPT_NAME;
+ if(d[0])I.push(['D',0,`<b>${esc(d[0].k)}</b> top spender: ${fv(d[0].v)} (<b>${pct(d[0].v,T)}</b>). Top 3 departments = ${pct(d.slice(0,3).reduce((s,x)=>s+x.v,0),T)}.`]);
+ const it=g.ITEM_CODE;
+ if(it[0])I.push(['P',0,`Pareto: <b>${fn(n80,0)}</b> of ${fn(it.length,0)} items (${pct(n80,it.length)}) drive 80% of value. Costliest: <b>${esc(nm[it[0].k])}</b> at ${fv(it[0].v)}.`]);
+ const mo=M.gm;
+ if(mo.length>1){const a=mo[mo.length-1],b=mo[mo.length-2],c=b.v?(a.v-b.v)/b.v*100:0,pk=mo.reduce((m,x)=>x.v>m.v?x:m,mo[0]);
+  I.push(['M',c>15,`${ml(a.k)} vs ${ml(b.k)}: <b class="${c>0?'up':'dn'}">${c>0?'▲':'▼'} ${Math.abs(c).toFixed(1)}%</b> (${fv(a.v)} vs ${fv(b.v)}). Peak month <b>${ml(pk.k)}</b> at ${fv(pk.v)}.${mo.length>2?' Monthly avg '+fv(T/mo.length)+'.':''}`])}
+ if(g.PLANT_NAME[0])I.push(['L',0,`Top plant <b>${esc(g.PLANT_NAME[0].k)}</b> = ${pct(g.PLANT_NAME[0].v,T)} of spend. Leading cost centre <b>${esc(g.COST_NAME[0].k)}</b>, equipment <b>${esc(g.EQPT_NAME[0].k)}</b>.`]);
+ if(g.ITEM_GROUP[0])I.push(['G',0,`Item group <b>${esc(g.ITEM_GROUP[0].k)}</b> biggest: ${pct(g.ITEM_GROUP[0].v,T)} of cost${g.ITEM_GROUP[1]?`, then <b>${esc(g.ITEM_GROUP[1].k)}</b> ${pct(g.ITEM_GROUP[1].v,T)}`:''}.`]);
+ let big=null;for(const r of S.rows)if(!big||r.V>big.V)big=r;
+ if(big)I.push(['1',0,`Largest single line: <b>${esc(big.ITEM_NAME)}</b>, ${fn(big.Q)} ${big.UM!=='(blank)'?esc(big.UM):''} = ${fv(big.V)} → ${esc(big.DEPT_NAME)} (${esc(big.VRNO)}${big.D?', '+fmtD(big.D):''}).`]);
+ if(M.RV[0]){const x=M.RV[0];I.push(['₹',1,`<b>${M.RV.length}</b> items issued at rates varying >10%. Excess over min rate ≈ <b>${fv(M.EX)}</b>. Worst: <b>${esc(nm[x.k])}</b> ${fn(x.mn)}–${fn(x.mx)} (${fv(x.ex)}).`])}
+ let nd=0,neg=0,negV=0;for(const r of S.rows){if(String(r.BATCH_NO).toUpperCase()==='N.D.')nd+=r.V;if(r.V<0){neg++;negV+=r.V}}
+ if(nd)I.push(['B',1,`<b>${pct(nd,T)}</b> of value has batch <b>N.D.</b> → traceability gap.`]);
+ if(neg)I.push(['−',1,`<b>${fn(neg,0)}</b> line${neg>1?'s':''} with negative value (returns / reversals), net ${fv(negV)}.`]);
+ const bl=[['DEPT_NAME','department'],['COST_NAME','cost centre'],['EQPT_NAME','equipment']].map(([k,l])=>{const x=g[k].find(z=>z.k==='(blank)');return x&&x.v>0?`${pct(x.v,T)} without ${l}`:null}).filter(Boolean);
+ if(bl.length)I.push(['?',1,`Untagged value: ${bl.join(', ')} → fix master tagging for cleaner allocation.`]);
+ return I;
+}
+
+function vBreak(){
+ $('#bd-seg').innerHTML=BD.map(([k,l])=>`<button data-k="${k}" class="${k===S.dim?'on':''}">${l}</button>`).join('');
+ $('#bd-seg').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.dim=b.dataset.k;S.sort['t-bd']=null;delete S.sort['t-bd'];vBreak()};
+ const k=S.dim,M=S.M,T=M.T,list=M.g[k];
+ $('#bd-t').textContent=LBL[k]+'-wise cost';$('#bd-t2').textContent=LBL[k]+'-wise table';
+ if(k==='MK'){const c=TC(),mo=M.gm;mk('c-bd',{type:'bar',data:{labels:mo.map(x=>ml(x.k)),datasets:[{data:mo.map(x=>x.v/S.unit),backgroundColor:c.acc,borderRadius:5,maxBarThickness:48}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:tipV}}},scales:{x:{grid:{display:false}},y:axV(c)},onClick:(e,el)=>{if(el[0])toggleSel('MK',mo[el[0].index].k)},onHover:ptr}})}
+ else hbar('c-bd',list,k,15);
+ let cum=0;const mx=list[0]?Math.abs(list[0].v):1;
+ const rows=list.map((x,i)=>({k:x.k,name:dv(k,x.k),v:x.v,q:x.q,n:x.n,t:x.t.size,i:x.i.size,sh:T?x.v/T:0,cum:T?(cum+=x.v)/T:0,rk:i+1}));
+ table('t-bd',[
+  {h:'#',k:'rk',n:1},{h:LBL[k],k:'name',sv:k==='MK'?r=>r.k:null,f:r=>esc(r.name),cl:'wr'},{h:'Value',k:'v',n:1,f:r=>fv(r.v)},{h:'Qty',k:'q',n:1,f:r=>fn(r.q)},
+  {h:'Lines',k:'n',n:1,f:r=>fn(r.n,0)},{h:'Txns',k:'t',n:1,f:r=>fn(r.t,0)},{h:'Items',k:'i',n:1,f:r=>fn(r.i,0)},
+  {h:'Share',k:'sh',n:1,f:r=>(r.sh*100).toFixed(1)+'%'},{h:'Cum.',k:'cum',n:1,f:r=>(r.cum*100).toFixed(1)+'%'},{h:'',k:'bar',ns:1,f:barCell(mx),cl:'bc'}
+ ].map(c=>{if(c.sv===null)delete c.sv;return c}),rows,{sk:k==='MK'?'name':'v',sd:k==='MK'?1:-1,row:r=>r.k,onRow:v=>toggleSel(k,v),
+  foot:['',`Total (${list.length})`,fv(T),fn(M.Q),fn(M.N,0),fn(M.V,0),fn(M.g.ITEM_CODE.length,0),'100%','','']});
+}
+
+function vItems(){
+ const M=S.M,T=M.T,it=M.g.ITEM_CODE;let cum=0,n80=0;
+ const all=it.map((x,i)=>{cum+=x.v;if(cum-x.v<T*.8)n80=i+1;return {rk:i+1,k:x.k,name:M.nm[x.k],grp:M.ig[x.k],um:M.um[x.k],q:x.q,v:x.v,avg:x.q?x.v/x.q:0,n:x.n,sh:T?x.v/T:0,cum:T?cum/T:0,cls:T&&cum-x.v<T*.8?'A':T&&cum-x.v<T*.95?'B':'C'}});
+ $('#par-s').textContent=`${fn(n80,0)} of ${fn(it.length,0)} items = 80% of value`;
+ pareto();
+ const draw=()=>{const q=$('#it-q').value.trim().toLowerCase();
+  const rows=q?all.filter(r=>(r.k+' '+r.name+' '+r.grp).toLowerCase().includes(q)):all;
+  $('#it-n').textContent=fn(rows.length,0)+' items';
+  table('t-it',[
+   {h:'#',k:'rk',n:1},{h:'ABC',k:'cls',f:r=>`<span class="pill ${r.cls==='A'?'hi':r.cls==='B'?'md':''}">${r.cls}</span>`},
+   {h:'Item',k:'name',cl:'wr',f:r=>`${esc(r.name)}<span class="tag">${esc(r.k)}</span>`},{h:'Group',k:'grp'},
+   {h:'Qty',k:'q',n:1,f:r=>fn(r.q)+(r.um!=='(blank)'?' <span class="mut">'+esc(r.um)+'</span>':'')},{h:'Value',k:'v',n:1,f:r=>fv(r.v)},
+   {h:'Avg rate',k:'avg',n:1,f:r=>fn(r.avg)},{h:'Lines',k:'n',n:1},{h:'Share',k:'sh',n:1,f:r=>(r.sh*100).toFixed(2)+'%'},{h:'Cum.',k:'cum',n:1,f:r=>(r.cum*100).toFixed(1)+'%'}
+  ],rows,{sk:'v',sd:-1,page:true});
+ };
+ $('#it-q').oninput=()=>{S.page['t-it']=0;draw()};draw();
+}
+
+function vRate(){
+ const M=S.M,th=+$('#rv-th').value,RV=M.RVall.filter(x=>x.sp>th),EX=RV.reduce((s,x)=>s+x.ex,0);
+ const items=new Set(S.rows.filter(r=>r.R>0&&r.Q>0).map(r=>r.ITEM_CODE)).size;
+ $('#rv-kp').innerHTML=[['Items flagged',fn(RV.length,0),`of ${fn(items,0)} items with rate`,'hero'],['Excess over min rate',fv(EX),pct(EX,M.T)+' of issue value'],
+  ['Top-10 flagged excess',fv(RV.slice(0,10).reduce((s,x)=>s+x.ex,0)),pct(RV.slice(0,10).reduce((s,x)=>s+x.ex,0),EX)+' of excess'],
+  ['Widest spread',RV.length?((Math.max(...RV.slice(0,2000).map(x=>x.sp))*100).toFixed(0)+'%'):'–','max ÷ min − 1']]
+  .map(k=>`<div class="k ${k[3]||''}"><div class="t">${k[0]}</div><div class="v">${k[1]}</div><div class="s">${k[2]}</div></div>`).join('');
+ hbar('c-rv',RV,null,12,{lab:x=>M.nm[x.k],val:x=>x.ex,color:TC().acc2,tip:t=>{const x=RV[t.dataIndex];return [' Excess: '+fv(x.ex),' Rate '+fn(x.mn)+' – '+fn(x.mx)+' (avg '+fn(x.avg)+')',' '+x.n+' lines']}});
+ const draw=()=>{const q=$('#rv-q').value.trim().toLowerCase();
+  const rows=RV.map(x=>({k:x.k,name:M.nm[x.k],um:M.um[x.k],n:x.n,q:x.q,mn:x.mn,avg:x.avg,mx:x.mx,sp:x.sp,ex:x.ex})).filter(r=>!q||(r.k+' '+r.name).toLowerCase().includes(q));
+  table('t-rv',[
+   {h:'Item',k:'name',cl:'wr',f:r=>`${esc(r.name)}<span class="tag">${esc(r.k)}</span>`},{h:'UM',k:'um',f:r=>r.um==='(blank)'?'':esc(r.um)},
+   {h:'Lines',k:'n',n:1},{h:'Qty',k:'q',n:1,f:r=>fn(r.q)},{h:'Min rate',k:'mn',n:1,f:r=>fn(r.mn)},{h:'Wtd avg',k:'avg',n:1,f:r=>fn(r.avg)},{h:'Max rate',k:'mx',n:1,f:r=>fn(r.mx)},
+   {h:'Spread',k:'sp',n:1,f:r=>`<span class="pill ${r.sp>.5?'hi':'md'}">${(r.sp*100).toFixed(0)}%</span>`},{h:'Excess',k:'ex',n:1,f:r=>fv(r.ex)}
+  ],rows,{sk:'ex',sd:-1,page:true});
+ };
+ $('#rv-q').oninput=()=>{S.page['t-rv']=0;draw()};$('#rv-th').onchange=()=>{S.page['t-rv']=0;vRate()};draw();
+}
+
+/* ---------- matrix (any rows × any columns) ---------- */
+const MXF=[['DEPT_NAME','Department'],['PLANT_NAME','Plant'],['MK','Month'],['DIV_CODE','Division'],['ITEM_GROUP','Item group'],['COST_NAME','Cost centre'],['EQPT_NAME','Equipment'],['ITEM_CODE','Item'],['UM','Unit']];
+function buildMatrixSel(){
+ const o=s=>MXF.map(([k,l])=>`<option value="${k}"${k===s?' selected':''}>${l}</option>`).join('');
+ $('#mx-r').innerHTML=o(S.mr);$('#mx-c').innerHTML=o(S.mc);
+ $('#mx-r').onchange=e=>{S.mr=e.target.value;vMatrix()};$('#mx-c').onchange=e=>{S.mc=e.target.value;vMatrix()};
+ ['#mx-m','#mx-p','#mx-nc','#mx-nr'].forEach(s=>$(s).onchange=()=>vMatrix());
+ $('#mx-sw').onclick=()=>{[S.mr,S.mc]=[S.mc,S.mr];$('#mx-r').value=S.mr;$('#mx-c').value=S.mc;vMatrix()};
+}
+const mxOpts=()=>({m:$('#mx-m').value,p:$('#mx-p').value,nc:+$('#mx-nc').value,nr:+$('#mx-nr').value});
+function matrix(rows,rk,ck,meas,nc,nr){
+ const A=()=>meas==='t'?{s:new Set}:{v:0};
+ const put=(a,r)=>{if(meas==='t')a.s.add(r.VRNO);else a.v+=meas==='v'?r.V:meas==='q'?r.Q:1};
+ const gv=a=>a?(meas==='t'?a.s.size:a.v):0;
+ const R=new Map(),C=new Map(),G=A();
+ for(const r of rows){let a=R.get(r[rk]);if(!a)R.set(r[rk],a=A());put(a,r);let b=C.get(r[ck]);if(!b)C.set(r[ck],b=A());put(b,r);put(G,r)}
+ const ord=(map,k)=>{const e=[...map.entries()].map(([key,a])=>[key,gv(a)]);e.sort(k==='MK'?(x,y)=>x[0]<y[0]?-1:x[0]>y[0]?1:0:(x,y)=>y[1]-x[1]);return e.map(x=>x[0])};
+ const ca=ord(C,ck),ra=ord(R,rk);
+ const lim=(arr,n,k)=>k!=='MK'&&n&&arr.length>n+1?[arr.slice(0,n),arr.length-n]:[arr.slice(),0];
+ const [cols,othC]=lim(ca,nc,ck),[rws,othR]=lim(ra,nr,rk);
+ const cs=new Set(cols),rs=new Set(rws);if(othC)cols.push('__o');if(othR)rws.push('__o');
+ const cell=new Map(),ct=new Map(),rt=new Map();
+ for(const r of rows){const c=cs.has(r[ck])?r[ck]:'__o',w=rs.has(r[rk])?r[rk]:'__o';
+  let rm=cell.get(w);if(!rm)cell.set(w,rm=new Map());let a=rm.get(c);if(!a)rm.set(c,a=A());put(a,r);
+  let b=ct.get(c);if(!b)ct.set(c,b=A());put(b,r);let d=rt.get(w);if(!d)rt.set(w,d=A());put(d,r)}
+ const out=rws.map(w=>{const rm=cell.get(w)||new Map(),cells=new Map();cols.forEach(c=>cells.set(c,gv(rm.get(c))));return {k:w,tot:gv(rt.get(w)),cells}});
+ const colT=new Map();cols.forEach(c=>colT.set(c,gv(ct.get(c))));
+ return {cols,rows:out,ct:colT,T:gv(G),othC,othR,nR:ra.length,nC:ca.length};
+}
+function vMatrix(){
+ const rk=S.mr,ck=S.mc,o=mxOpts();
+ if(rk===ck){$('#t-mx').innerHTML='<p class="mut">Pick different row and column fields.</p>';$('#mx-n').textContent='';return}
+ const X=matrix(S.rows,rk,ck,o.m,o.nc,o.nr);
+ const fm=o.m==='v'?fv:o.m==='q'?(x=>fn(x)):(x=>fn(x,0));
+ const pv=(v,rt,c)=>o.p==='row'?(rt?v/rt:0):o.p==='col'?(c?v/c:0):o.p==='tot'?(X.T?v/X.T:0):v;
+ let mx=0;X.rows.forEach(r=>X.cols.forEach(c=>{const v=pv(r.cells.get(c),r.tot,X.ct.get(c));if(v>mx)mx=v}));
+ const show=(v,rt,c)=>o.p?(pv(v,rt,c)*100).toFixed(1)+'%':fm(v);
+ const cell=(v,rt,c)=>{if(!v)return '<td class="n z">–</td>';const a=Math.max(0,pv(v,rt,c)/(mx||1));
+  return `<td class="n" style="background:rgba(var(--hm),${(0.05+a*0.7).toFixed(3)})" title="${esc(fm(v))}">${show(v,rt,c)}</td>`};
+ const cn=c=>c==='__o'?`Others (${X.othC})`:dv(ck,c),rn=k=>k==='__o'?`Others (${X.othR})`:dv(rk,k);
+ const tot=(v,isRow)=>o.p==='row'?(isRow?'100%':pct(v,X.T)):o.p==='col'?(isRow?pct(v,X.T):'100%'):o.p==='tot'?pct(v,X.T):fm(v);
+ const canF=!!S.sel[rk];
+ $('#t-mx').innerHTML=`<div class="tw"><table class="hm"><thead><tr><th>${LBL[rk]} \\ ${LBL[ck]}</th>${X.cols.map(c=>`<th class="n" title="${esc(cn(c))}">${esc(cn(c))}</th>`).join('')}<th class="n">Total</th></tr></thead>
+ <tbody>${X.rows.map(r=>`<tr${canF&&r.k!=='__o'?` class="clk" data-v="${esc(r.k)}" title="Click to filter"`:''}><td>${esc(rn(r.k))}</td>${X.cols.map(c=>cell(r.cells.get(c),r.tot,X.ct.get(c))).join('')}<td class="n"><b>${tot(r.tot,1)}</b></td></tr>`).join('')}</tbody>
+ <tfoot><tr><td>Total</td>${X.cols.map(c=>`<td class="n">${tot(X.ct.get(c),0)}</td>`).join('')}<td class="n">${o.p?'100%':fm(X.T)}</td></tr></tfoot></table></div>`;
+ $('#t-mx').onclick=e=>{const tr=e.target.closest('tr.clk');if(tr)toggleSel(rk,tr.dataset.v)};
+ $('#mx-n').textContent=`${fn(X.nR,0)} ${LBL[rk].toLowerCase()} rows × ${fn(X.nC,0)} ${LBL[ck].toLowerCase()} columns.${X.othR?' Rows beyond top '+(X.rows.length-1)+' grouped as Others.':''}${X.othC?' Columns beyond top '+(X.cols.length-1)+' grouped as Others.':''} Shade = relative size${o.p?' of shown %':''}. Export button gives same view.`;
+}
+
+/* ---------- plant-wise analysis ---------- */
+function plantStats(){
+ const M=S.M,T=M.T,mo=M.gm,lk=mo.length?mo[mo.length-1].k:null,pk=mo.length>1?mo[mo.length-2].k:null,m=new Map(),mn=new Map(),SEP='\u0001';
+ for(const r of S.rows){let x=m.get(r.PLANT_NAME);if(!x)m.set(r.PLANT_NAME,x={k:r.PLANT_NAME,v:0,n:0,t:new Set,i:new Set,d:new Map,g:new Map,lm:0,pm:0,ex:0});
+  x.v+=r.V;x.n++;x.t.add(r.VRNO);x.i.add(r.ITEM_CODE);x.d.set(r.DEPT_NAME,(x.d.get(r.DEPT_NAME)||0)+r.V);x.g.set(r.ITEM_GROUP,(x.g.get(r.ITEM_GROUP)||0)+r.V);
+  if(r.MK===lk)x.lm+=r.V;else if(r.MK===pk)x.pm+=r.V;
+  if(r.R>0&&r.Q>0){const key=r.PLANT_NAME+SEP+r.ITEM_CODE,o=mn.get(key);if(o===undefined||r.R<o)mn.set(key,r.R)}}
+ for(const r of S.rows)if(r.R>0&&r.Q>0)m.get(r.PLANT_NAME).ex+=(r.R-mn.get(r.PLANT_NAME+SEP+r.ITEM_CODE))*r.Q;
+ const top=mp=>{let b='',bv=-Infinity;mp.forEach((v,k)=>{if(v>bv){bv=v;b=k}});return b};
+ return {lk,pk,list:[...m.values()].map(x=>({k:x.k,v:x.v,sh:T?x.v/T:0,n:x.n,t:x.t.size,i:x.i.size,dn:x.d.size,avg:x.t.size?x.v/x.t.size:0,lm:x.lm,pm:x.pm,mom:x.pm?(x.lm-x.pm)/x.pm:null,td:top(x.d),tg:top(x.g),ex:x.ex})).sort((a,b)=>b.v-a.v)};
+}
+const kh=K=>K.map(k=>`<div class="k ${k[3]||''}"><div class="t">${k[0]}</div><div class="v" title="${esc(String(k[1]).replace(/<[^>]+>/g,''))}">${k[1]}</div><div class="s">${k[2]}</div></div>`).join('');
+const momH=(m,pre)=>m==null?'–':`<span class="${m>0?'up':'dn'}">${m>0?'▲':'▼'} ${Math.abs(m*100).toFixed(1)}%</span>${pre||''}`;
+function vPlants(){
+ const M=S.M,P=plantStats(),L=P.list,c=TC();
+ $('#pl-sub').textContent=L.length+' plant'+(L.length==1?'':'s')+' in current filter';
+ if(!L.length){$('#pl-kp').innerHTML='';$('#t-pl').innerHTML='<p class="mut">No rows match filters.</p>';return}
+ const lead=L[0],grow=L.filter(x=>x.mom!=null).sort((a,b)=>b.mom-a.mom)[0],exc=L.slice().sort((a,b)=>b.ex-a.ex)[0];
+ const lm=P.lk?ml(P.lk):'',pm=P.pk?ml(P.pk):'';
+ $('#pl-kp').innerHTML=kh([['Plants',fn(L.length,0),fn(M.g.DEPT_NAME.length,0)+' departments · '+fv(M.T),'hero'],
+  ['Top plant',esc(lead.k),fv(lead.v)+' · '+pct(lead.v,M.T)+' of spend'],
+  ['Fastest growth',grow?esc(grow.k):'–',grow?momH(grow.mom,' '+lm+' vs '+pm):'needs 2+ months'],
+  ['Highest rate excess',esc(exc.k),fv(exc.ex)+' over own min rates']]);
+ const mxv=lead.v,s=f=>L.reduce((a,x)=>a+f(x),0),sl=s(x=>x.lm),sp=s(x=>x.pm);
+ table('t-pl',[
+  {h:'#',k:'rk',n:1},{h:'Plant',k:'k',cl:'wr',f:r=>`<b>${esc(r.k)}</b>${r.k===S.pl?'<span class="tag">drilled</span>':''}`},
+  {h:'Value',k:'v',n:1,f:r=>fv(r.v)},{h:'Share',k:'sh',n:1,f:r=>(r.sh*100).toFixed(1)+'%'},{h:'',k:'bar',ns:1,f:barCell(mxv),cl:'bc'},
+  {h:'Lines',k:'n',n:1,f:r=>fn(r.n,0)},{h:'Txns',k:'t',n:1,f:r=>fn(r.t,0)},{h:'Items',k:'i',n:1,f:r=>fn(r.i,0)},{h:'Depts',k:'dn',n:1},
+  {h:'Avg / txn',k:'avg',n:1,f:r=>fv(r.avg)},{h:pm||'Prev month',k:'pm',n:1,f:r=>fv(r.pm)},{h:lm||'Last month',k:'lm',n:1,f:r=>fv(r.lm)},
+  {h:'MoM',k:'mom',n:1,sv:r=>r.mom==null?-Infinity:r.mom,f:r=>momH(r.mom)},
+  {h:'Top department',k:'td',cl:'w2'},{h:'Top item group',k:'tg',cl:'w2'},{h:'Rate excess',k:'ex',n:1,f:r=>fv(r.ex)}
+ ],L.map((x,i)=>Object.assign({rk:i+1},x)),{sk:'v',sd:-1,row:r=>r.k,rt:'Click to drill down',onRow:v=>{S.pl=v;vPlants();$('#pl-drill').scrollIntoView({behavior:'smooth',block:'start'})},
+  foot:['',`Total (${L.length})`,fv(M.T),'100%','',fn(M.N,0),fn(M.V,0),fn(M.g.ITEM_CODE.length,0),fn(M.g.DEPT_NAME.length,0),fv(M.V?M.T/M.V:0),fv(sp),fv(sl),momH(sp?(sl-sp)/sp:null),'','',fv(s(x=>x.ex))]});
+ const X=matrix(S.rows,'PLANT_NAME','MK','v',0,6);
+ mk('c-plmo',{type:'bar',data:{labels:X.cols.map(ml),datasets:X.rows.map((r,i)=>({label:r.k==='__o'?'Others ('+X.othR+')':trunc(r.k,24),data:X.cols.map(k=>r.cells.get(k)/S.unit),backgroundColor:c.pal[i%c.pal.length],maxBarThickness:46}))},
+  options:{maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{color:c.tx,boxWidth:9,boxHeight:9,usePointStyle:true}},
+   tooltip:{callbacks:{label:t=>' '+t.dataset.label+': '+fv(t.raw*S.unit),footer:t=>'Total: '+fv(t.reduce((a,x)=>a+x.raw,0)*S.unit)}}},
+   scales:{x:{stacked:true,grid:{display:false}},y:Object.assign(axV(c),{stacked:true})}}});
+ const Y=matrix(S.rows,'PLANT_NAME','ITEM_GROUP','v',7,10);
+ mk('c-plig',{type:'bar',data:{labels:Y.rows.map(r=>r.k==='__o'?'Others ('+Y.othR+')':trunc(r.k,22)),datasets:Y.cols.map((g,i)=>({label:g==='__o'?'Other groups':trunc(g,22),data:Y.rows.map(r=>r.tot?r.cells.get(g)/r.tot*100:0),backgroundColor:c.pal[i%c.pal.length],maxBarThickness:26}))},
+  options:{indexAxis:'y',maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{color:c.tx,boxWidth:9,boxHeight:9,usePointStyle:true}},
+   tooltip:{callbacks:{title:t=>{const r=Y.rows[t[0].dataIndex];return (r.k==='__o'?'Others':r.k)+' · '+fv(r.tot)},label:t=>' '+t.dataset.label+': '+t.raw.toFixed(1)+'%'}}},
+   scales:{x:{stacked:true,max:100,ticks:{callback:v=>v+'%'},grid:{color:c.line}},y:{stacked:true,ticks:{color:c.tx},grid:{display:false}}},
+   onClick:(e,el)=>{if(el[0]){const r=Y.rows[el[0].index];if(r.k!=='__o'){S.pl=r.k;vPlants();$('#pl-drill').scrollIntoView({behavior:'smooth',block:'start'})}}},onHover:ptr}});
+ plDrill(L,P);
+}
+function plDrill(L,P){
+ if(!L.find(x=>x.k===S.pl))S.pl=L[0].k;
+ $('#pl-sel').innerHTML=L.map(x=>`<option value="${esc(x.k)}"${x.k===S.pl?' selected':''}>${esc(x.k)} — ${fv(x.v)}</option>`).join('');
+ $('#pl-sel').onchange=e=>{S.pl=e.target.value;vPlants()};
+ $('#pl-f').onclick=()=>{S.sel.PLANT_NAME=new Set([S.pl]);render()};
+ const R=S.rows.filter(r=>r.PLANT_NAME===S.pl),x=L.find(z=>z.k===S.pl),PT=x.v,c=TC();
+ $('#pl-dt').textContent=S.pl;
+ $('#pl-dkp').innerHTML=kh([['Plant value',fv(x.v),pct(x.v,S.M.T)+' of filtered spend','hero'],['Transactions',fn(x.t,0),fv(x.avg)+' avg / txn'],
+  ['Items · Depts',fn(x.i,0)+' · '+fn(x.dn,0),fn(x.n,0)+' lines'],['Month on month',momH(x.mom),P.lk&&P.pk?ml(P.lk)+' '+fv(x.lm)+' vs '+ml(P.pk)+' '+fv(x.pm):'needs 2+ months'],['Rate excess',fv(x.ex),'over own min rates']]);
+ const tip=t=>' '+fv(t.raw*S.unit)+' · '+pct(t.raw*S.unit,PT)+' of plant';
+ hbar('c-pld',grp(R,'DEPT_NAME'),'DEPT_NAME',10,{tip});
+ hbar('c-plg',grp(R,'ITEM_GROUP'),'ITEM_GROUP',10,{tip,color:c.acc2});
+ hbar('c-plc',grp(R,'COST_NAME'),'COST_NAME',10,{tip,color:'#6c8cff'});
+ hbar('c-ple',grp(R,'EQPT_NAME'),'EQPT_NAME',10,{tip,color:'#e0607e'});
+ table('t-pli',[
+  {h:'#',k:'rk',n:1},{h:'ABC',k:'cls',f:r=>`<span class="pill ${r.cls==='A'?'hi':r.cls==='B'?'md':''}">${r.cls}</span>`},
+  {h:'Item',k:'name',cl:'wr',f:r=>`${esc(r.name)}<span class="tag">${esc(r.k)}</span>`},{h:'Group',k:'grp'},
+  {h:'Qty',k:'q',n:1,f:r=>fn(r.q)+(r.um!=='(blank)'?' <span class="mut">'+esc(r.um)+'</span>':'')},{h:'Value',k:'v',n:1,f:r=>fv(r.v)},
+  {h:'Avg rate',k:'avg',n:1,f:r=>fn(r.avg)},{h:'Share of plant',k:'sh',n:1,f:r=>(r.sh*100).toFixed(2)+'%'},{h:'Cum.',k:'cum',n:1,f:r=>(r.cum*100).toFixed(1)+'%'}
+ ],itemRows(R).slice(0,50),{sk:'v',sd:-1});
+}
+function itemRows(rows){
+ const g=grp(rows,'ITEM_CODE'),nm={},ig={},um={};for(const r of rows){nm[r.ITEM_CODE]=r.ITEM_NAME;ig[r.ITEM_CODE]=r.ITEM_GROUP;um[r.ITEM_CODE]=r.UM}
+ let T=0;g.forEach(x=>T+=x.v);let c=0;
+ return g.map((x,i)=>{const pre=c;c+=x.v;return {rk:i+1,k:x.k,name:nm[x.k],grp:ig[x.k],um:um[x.k],q:x.q,v:x.v,avg:x.q?x.v/x.q:0,n:x.n,sh:T?x.v/T:0,cum:T?c/T:0,cls:T&&pre<T*.8?'A':T&&pre<T*.95?'B':'C'}});
+}
+const qf=(arr,q,f)=>{q=String(q||'').trim().toLowerCase();return q?arr.filter(r=>f(r).toLowerCase().includes(q)):arr};
+function dataFilter(q){const terms=String(q||'').trim().toLowerCase().split(/\s+/).filter(Boolean);return terms.length?S.rows.filter(r=>terms.every(t=>r._s.includes(t))):S.rows}
+
+function vData(){
+ const draw=()=>{const rows=dataFilter($('#dt-q').value);
+  $('#dt-n').textContent=fn(rows.length,0)+' lines · '+fv(rows.reduce((s,r)=>s+r.V,0));
+  table('t-dt',[
+   {h:'Date',k:'D',sv:r=>r.D?+r.D:0,f:r=>r.D?fmtD(r.D):''},{h:'VR No',k:'VRNO'},{h:'Department',k:'DEPT_NAME'},{h:'Plant',k:'PLANT_NAME'},
+   {h:'Cost centre',k:'COST_NAME'},{h:'Equipment',k:'EQPT_NAME'},{h:'Group',k:'ITEM_GROUP'},
+   {h:'Item',k:'ITEM_NAME',cl:'wr',f:r=>`${esc(r.ITEM_NAME)}<span class="tag">${esc(r.ITEM_CODE)}</span>`},
+   {h:'Qty',k:'Q',n:1,f:r=>fn(r.Q)+(r.UM!=='(blank)'?' <span class="mut">'+esc(r.UM)+'</span>':'')},{h:'Rate',k:'R',n:1,f:r=>fn(r.R)},{h:'Value',k:'V',n:1,f:r=>fv(r.V)}
+  ],rows,{sk:'D',sd:-1,page:true});
+ };
+ let tm;$('#dt-q').oninput=()=>{clearTimeout(tm);tm=setTimeout(()=>{S.page['t-dt']=0;draw()},200)};draw();
+}
+
+/* ---------- Excel export (whole report + per card) ---------- */
+const XICO='<svg class="ico" viewBox="0 0 24 24"><path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14"/></svg>';
+function injectX(){
+ $$('[data-x]').forEach(c=>{
+  const b=document.createElement('button');b.type='button';b.className='xb';b.dataset.xk=c.dataset.x;b.title='Download this as Excel';b.innerHTML=XICO+'<span>Excel</span>';
+  if(c.classList.contains('vh')){b.classList.add('push');b.innerHTML=XICO+'<span>Export tab</span>';c.appendChild(b);return}
+  const hd=c.querySelector(':scope > .hd');
+  if(hd){const w=document.createElement('div');w.className='xr';const sm=hd.querySelector(':scope > small');if(sm)w.appendChild(sm);w.appendChild(b);hd.appendChild(w);return}
+  const tb=c.querySelector(':scope > .tb');if(tb){b.classList.add('push');tb.appendChild(b)}
+ });
+}
+document.addEventListener('click',e=>{const b=e.target.closest('.xb');if(b&&!b.disabled)exportOne(b.dataset.xk,b)});
+$('#ex').onclick=()=>exportOne('all',$('#ex'));
+
+const flt=()=>DIMS.filter(([k])=>S.sel[k].size).map(([k,l])=>l+': '+[...S.sel[k]].map(v=>dv(k,v)).join(', ')).join(' | ')||'None';
+const txt=h=>{const d=document.createElement('div');d.innerHTML=h;return d.textContent};
+
+function specSummary(){
+ const M=S.M,g=M.g,U=S.unit,u=UN[U],T=M.T||1,top10=g.ITEM_CODE.slice(0,10).reduce((s,x)=>s+x.v,0);
+ const sm=[['Total issue value ('+u+')',M.T/U,'v'],['Total qty',M.Q,'r'],['Lines',M.N,'i'],['Transactions',M.V,'i'],['Avg value / txn ('+u+')',(M.V?M.T/M.V:0)/U,'v'],['Items',g.ITEM_CODE.length,'i'],['Plants',g.PLANT_NAME.length,'i'],['Departments',g.DEPT_NAME.length,'i'],['Cost centres',g.COST_NAME.length,'i'],['Top-10 item share',top10/T,'p'],['Rate excess over min ('+u+')',M.EX/U,'v'],['Items with >10% rate spread',M.RV.length,'i']];
+ return {name:'Summary',title:'Costing Summary',cols:[['Metric','t'],['Value','x']],rows:sm.map(x=>[x[0],x[1]]),fmt:ri=>sm[ri][2],notes:['Insights',...insights().map(x=>'• '+txt(x[2]))]};
+}
+function specDim(k,rows,pre){
+ const U=S.unit,u=UN[U],list=grp(rows,k);if(k==='MK')list.sort((a,b)=>a.k<b.k?-1:a.k>b.k?1:0);
+ let T=0,Q=0,N=0;const tx=new Set,it=new Set;for(const r of rows){T+=r.V;Q+=r.Q;N++;tx.add(r.VRNO);it.add(r.ITEM_CODE)}const TT=T||1;let c=0;
+ return {name:(pre?pre+' ':'')+LBL[k]+'wise',title:(pre?pre+' · ':'')+LBL[k]+'-wise Summary',cols:[[LBL[k],'t'],['Value ('+u+')','v'],['Qty','r'],['Lines','i'],['Txns','i'],['Items','i'],['Share %','p'],['Cum %','p']],
+  rows:list.map(x=>[String(dv(k,x.k)),x.v/U,x.q,x.n,x.t.size,x.i.size,x.v/TT,(c+=x.v)/TT]),foot:['Total',T/U,Q,N,tx.size,it.size,1,null]};
+}
+function specItems(rows,q,pre){
+ const U=S.unit,R=qf(itemRows(rows),q,r=>r.k+' '+r.name+' '+r.grp);
+ return {name:(pre?pre+' ':'')+'Items',title:(pre?pre+' · ':'')+'Item-wise (ABC)'+(q?' · search "'+q+'"':''),cols:[['Rank','i'],['ABC','t'],['Item code','t'],['Item name','t'],['Item group','t'],['UM','t'],['Qty','r'],['Value ('+UN[U]+')','v'],['Avg rate','r'],['Lines','i'],['Share %','p'],['Cum %','p']],
+  rows:R.map(r=>[r.rk,r.cls,r.k,r.name,r.grp,r.um==='(blank)'?'':r.um,r.q,r.v/U,r.avg,r.n,r.sh,r.cum])};
+}
+function specRV(th,q){
+ const M=S.M,U=S.unit,R=qf(M.RVall.filter(x=>x.sp>th),q,x=>x.k+' '+M.nm[x.k]);
+ return {name:'Rate Variance',title:'Rate Variance (>'+Math.round(th*100)+'% spread)'+(q?' · search "'+q+'"':''),cols:[['Item code','t'],['Item name','t'],['UM','t'],['Lines','i'],['Qty','r'],['Min rate','r'],['Wtd avg rate','r'],['Max rate','r'],['Spread %','p'],['Excess ('+UN[U]+')','v']],
+  rows:R.map(x=>[x.k,M.nm[x.k],M.um[x.k]==='(blank)'?'':M.um[x.k],x.n,x.q,x.mn,x.avg,x.mx,x.sp,x.ex/U]),foot:['Total','','',null,null,null,null,null,null,R.reduce((s,x)=>s+x.ex,0)/U]};
+}
+function specMx(rows,rk,ck,o,pre){
+ const X=matrix(rows,rk,ck,o.m,o.nc,o.nr),U=S.unit,mv=o.m==='v';
+ const val=(v,rt,c)=>o.p==='row'?(rt?v/rt:0):o.p==='col'?(c?v/c:0):o.p==='tot'?(X.T?v/X.T:0):(mv?v/U:v);
+ const f=o.p?'p':mv?'v':o.m==='q'?'r':'i',raw=v=>mv?v/U:v;
+ const cn=c=>c==='__o'?'Others ('+X.othC+')':String(dv(ck,c));
+ const mname={v:'Value ('+UN[U]+')',q:'Qty',n:'Lines',t:'Transactions'}[o.m],pname={row:'% of row',col:'% of column',tot:'% of total'}[o.p];
+ return {name:(pre?pre+' ':'')+LBL[rk]+' x '+LBL[ck],title:(pre?pre+' · ':'')+LBL[rk]+' × '+LBL[ck]+' — '+mname+(pname?' ('+pname+')':''),
+  cols:[[LBL[rk]+' \\ '+LBL[ck],'t'],...X.cols.map(c=>[cn(c),f]),['Total',f]],
+  rows:X.rows.map(r=>[r.k==='__o'?'Others ('+X.othR+')':String(dv(rk,r.k)),...X.cols.map(c=>val(r.cells.get(c),r.tot,X.ct.get(c))),o.p==='row'?1:o.p?(X.T?r.tot/X.T:0):raw(r.tot)]),
+  foot:['Total',...X.cols.map(c=>o.p==='col'?1:o.p?(X.T?X.ct.get(c)/X.T:0):raw(X.ct.get(c))),o.p?1:raw(X.T)]};
+}
+function specPlants(){
+ const P=plantStats(),U=S.unit,u=UN[U],L=P.list,s=f=>L.reduce((a,x)=>a+f(x),0),M=S.M;
+ return {name:'Plant Comparison',title:'Plant-wise Comparison',cols:[['Plant','t'],['Value ('+u+')','v'],['Share %','p'],['Lines','i'],['Txns','i'],['Items','i'],['Departments','i'],['Avg / txn ('+u+')','v'],[(P.pk?ml(P.pk):'Prev month')+' ('+u+')','v'],[(P.lk?ml(P.lk):'Last month')+' ('+u+')','v'],['MoM %','p'],['Top department','t'],['Top item group','t'],['Rate excess ('+u+')','v']],
+  rows:L.map(x=>[x.k,x.v/U,x.sh,x.n,x.t,x.i,x.dn,x.avg/U,x.pm/U,x.lm/U,x.mom,x.td,x.tg,x.ex/U]),
+  foot:['Total',M.T/U,1,M.N,M.V,M.g.ITEM_CODE.length,M.g.DEPT_NAME.length,(M.V?M.T/M.V:0)/U,s(x=>x.pm)/U,s(x=>x.lm)/U,null,'','',s(x=>x.ex)/U]};
+}
+function specData(rows){
+ return {name:'Data',title:'Filtered Data (Rupees)',plain:true,cols:[['VRDATE','d'],['VRNO','t'],['DEPT_NAME','t'],['PLANT_NAME','t'],['DIV_CODE','t'],['COST_NAME','t'],['EQPT_NAME','t'],['ITEM_GROUP','t'],['ITEM_CODE','t'],['ITEM_NAME','t'],['UM','t'],['BATCH_NO','t'],['QTY_ISSUED','r'],['RATE','r'],['VAL_ISSUED','r']],
+  rows:rows.map(r=>[r.D?new Date(Date.UTC(r.D.getFullYear(),r.D.getMonth(),r.D.getDate())):null,r.VRNO,r.DEPT_NAME,r.PLANT_NAME,r.DIV_CODE,r.COST_NAME,r.EQPT_NAME,r.ITEM_GROUP,r.ITEM_CODE,r.ITEM_NAME,r.UM,r.BATCH_NO,r.Q,r.R,r.V])};
+}
+
+function addSheet(W,sp){
+ const U=S.unit,F={v:U==1?'#,##0':'#,##0.00',r:'#,##0.00',i:'#,##0',p:'0.0%',d:'dd-mmm-yyyy'};
+ let nm=String(sp.name).replace(/[\[\]:*?\/\\]/g,'-').slice(0,31).trim()||'Sheet',n=2;while(W.getWorksheet(nm))nm=nm.slice(0,26)+' ('+(n++)+')';
+ const cols=sp.cols,s=W.addWorksheet(nm,{views:[{state:'frozen',ySplit:3,xSplit:1,showGridLines:false}]});
+ s.mergeCells(1,1,1,Math.max(2,Math.min(cols.length,10)));
+ const t=s.getCell(1,1);t.value=sp.title;t.font={bold:true,size:15,color:{argb:'FF1B2130'}};
+ s.getCell(2,1).value=`Values in ${UN[U]} · Filters: ${flt()} · Source: ${S.file} · Generated ${new Date().toLocaleString('en-IN')}`;s.getCell(2,1).font={italic:true,size:9,color:{argb:'FF667085'}};
+ const h=s.getRow(3);cols.forEach(([x,f],i)=>{const c=h.getCell(i+1);c.value=x;c.font={bold:true,color:{argb:'FFFFFFFF'}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1B2130'}};c.alignment={horizontal:f==='t'?'left':'right',vertical:'middle',wrapText:true}});h.height=30;
+ if(sp.plain){s.addRows(sp.rows);cols.forEach(([x,f],i)=>{if(F[f])s.getColumn(i+1).numFmt=F[f]})}
+ else sp.rows.forEach((r,ri)=>{const row=s.addRow(r);cols.forEach(([x,f],i)=>{const c=row.getCell(i+1),ff=f==='x'&&sp.fmt?sp.fmt(ri):f;if(F[ff])c.numFmt=F[ff];c.border={bottom:{style:'thin',color:{argb:'FFE2DCCF'}}};if(ri%2)c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF8F6F1'}}})});
+ if(sp.foot){const row=s.addRow(sp.foot);cols.forEach(([x,f],i)=>{const c=row.getCell(i+1);if(F[f])c.numFmt=F[f];c.font={bold:true};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFCE7C3'}};c.border={top:{style:'medium',color:{argb:'FFC27408'}}}})}
+ cols.forEach(([x,f],i)=>{let m=Math.min(String(x).length,24);if(f==='t'||f==='x')for(const r of sp.rows.slice(0,400))m=Math.max(m,String(r[i]==null?'':r[i]).length);else m=Math.max(m,13);s.getColumn(i+1).width=Math.min(f==='x'?18:50,m+3)});
+ s.autoFilter={from:{row:3,column:1},to:{row:3,column:cols.length}};
+ if(sp.notes){s.addRow([]);sp.notes.forEach((x,i)=>{const r=s.addRow([x]);if(!i)r.font={bold:true,size:12}})}
+}
+async function exportOne(key,btn){
+ if(!window.ExcelJS){alert('Excel library not loaded (check internet).');return}
+ if(!S.M)return;
+ const [a,b,c]=key.split(':'),o0={m:'v',p:'',nc:0,nr:0};let sp=[],nm='Report';
+ switch(a){
+  case 'all':sp=[specSummary(),specPlants(),...['PLANT_NAME','DEPT_NAME','ITEM_GROUP','COST_NAME','EQPT_NAME','DIV_CODE','MK'].map(k=>specDim(k,S.rows)),specItems(S.rows,''),specRV(0.1,''),specMx(S.rows,'PLANT_NAME','MK',o0),S.mr!==S.mc?specMx(S.rows,S.mr,S.mc,mxOpts()):null,specData(S.rows)].filter(Boolean);nm='Full_Report';break;
+  case 'summary':sp=[specSummary()];nm='Summary';break;
+  case 'dim':sp=[specDim(b,S.rows)];nm=LBL[b]+'wise';break;
+  case 'bd':sp=[specDim(S.dim,S.rows)];nm=LBL[S.dim]+'wise';break;
+  case 'items':sp=[specItems(S.rows,$('#it-q').value)];nm='Items';break;
+  case 'rv':sp=[specRV(+$('#rv-th').value,$('#rv-q').value)];nm='Rate_Variance';break;
+  case 'mx':if(!b&&S.mr===S.mc){alert('Pick different row and column fields.');return}
+   sp=[b?specMx(S.rows,b,c,o0):specMx(S.rows,S.mr,S.mc,mxOpts())];nm='Matrix_'+(b?LBL[b]+'_x_'+LBL[c]:LBL[S.mr]+'_x_'+LBL[S.mc]);break;
+  case 'data':sp=[specData(dataFilter($('#dt-q').value))];nm='Data';break;
+  case 'plants':sp=[specPlants(),specMx(S.rows,'PLANT_NAME','MK',o0),specMx(S.rows,'PLANT_NAME','ITEM_GROUP',o0),specMx(S.rows,'PLANT_NAME','DEPT_NAME',o0),specMx(S.rows,'PLANT_NAME','COST_NAME',o0)];nm='Plant_Analysis';break;
+  case 'plcmp':sp=[specPlants()];nm='Plant_Comparison';break;
+  case 'pl':{const R=S.rows.filter(r=>r.PLANT_NAME===S.pl);sp=[b==='items'?specItems(R,'',S.pl):specDim(b,R,S.pl)];nm=S.pl+'_'+(b==='items'?'Items':LBL[b]+'wise');break}
+  default:return;
+ }
+ const old=btn?btn.innerHTML:'';if(btn){btn.disabled=true;btn.innerHTML='<span>Building…</span>'}
+ try{
+  const W=new ExcelJS.Workbook();W.creator='Costing Intelligence';W.created=new Date();
+  sp.forEach(x=>addSheet(W,x));
+  const blob=new Blob([await W.xlsx.writeBuffer()],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),el=document.createElement('a');
+  el.href=URL.createObjectURL(blob);el.download='Costing_'+nm.replace(/[^\w\-]+/g,'_').replace(/_+/g,'_')+'_'+new Date().toISOString().slice(0,10)+'.xlsx';
+  document.body.appendChild(el);el.click();el.remove();setTimeout(()=>URL.revokeObjectURL(el.href),4000);
+ }catch(err){alert('Export failed: '+err.message)}
+ finally{if(btn){btn.disabled=false;btn.innerHTML=old}}
+}
+injectX();
+
+/* ---------- sample data ---------- */
+$('#smp').onclick=()=>{
+ let s=20261029;const rnd=()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+ const pick=a=>a[Math.floor(rnd()*a.length)],wpick=a=>{let x=rnd()*a.reduce((s,y)=>s+y[1],0);for(const y of a){x-=y[1];if(x<=0)return y[0]}return a[0][0]};
+ const depts=[['Tube Mill',9],['Pilger Mill',8],['Cold Draw',7],['Annealing',6],['Pickling',6],['Maintenance - Mech',7],['Maintenance - Elec',5],['Finishing',4],['QA Lab',2],['Utilities',4],['Packing',3],['Stores',1]];
+ const plants=[['Plant A',10],['Plant B',7],['Plant C',4],['Plant D',2]];
+ const items=[['Pilger Die 38mm','Tools','NOS',18500],['Mandrel Bar 25mm','Tools','NOS',9200],['Grinding Wheel 14in','Consumables','NOS',2100],['Nitric Acid','Chemicals','KG',42],['Hydrofluoric Acid','Chemicals','KG',165],['Hydraulic Oil 68','Lubricants','LTR',148],['Drawing Lubricant','Lubricants','LTR',212],['Bearing 6205','Spares - Mechanical','NOS',380],['Bearing 22220','Spares - Mechanical','NOS',8600],['V-Belt B-52','Spares - Mechanical','NOS',420],['Contactor 32A','Spares - Electrical','NOS',2650],['VFD Cooling Fan','Spares - Electrical','NOS',1850],['Argon Gas','Gases','M3',58],['LPG','Gases','KG',92],['Wooden Packing Box','Packing Material','NOS',1450],['HDPE Strap','Packing Material','KG',118],['Refractory Brick','Refractory','NOS',260],['Ceramic Blanket','Refractory','ROLL',5400],['Cutting Blade 350','Tools','NOS',3100],['Welding Electrode','Consumables','KG',310],['Cotton Waste','Consumables','KG',65],['Safety Gloves','Consumables','PAIR',85],['Gear Coupling','Spares - Mechanical','NOS',14200],['Proximity Sensor','Spares - Electrical','NOS',3300],['Hydraulic Seal Kit','Spares - Mechanical','SET',6100],['Soap Powder (Drawing)','Lubricants','KG',96],['Lime','Chemicals','KG',14],['Caustic Soda','Chemicals','KG',48],['Plug 19mm','Tools','NOS',2750],['Straightener Roll','Spares - Mechanical','NOS',38500]];
+ const ccs=['CC-Production','CC-Maintenance','CC-Utilities','CC-Quality','CC-Admin'],eqs=['Pilger 1','Pilger 2','Draw Bench 1','Draw Bench 2','Furnace 1','Pickling Tank','Straightener','Saw Cutter','Compressor','(none)'];
+ const now=new Date(2026,9,28),rows=[];let vr=5000;
+ for(let i=0;i<4200;i++){
+  if(i%4===0)vr++;
+  const d=new Date(now.getFullYear(),now.getMonth()-Math.floor(rnd()*6),1+Math.floor(rnd()*28));
+  const it=pick(items),dep=wpick(depts),pl=wpick(plants),bump=rnd()<.06?1.18+rnd()*.4:1+(rnd()-.5)*.08;
+  const q=Math.max(1,Math.round((it[3]>5000?1+rnd()*3:it[3]>500?2+rnd()*20:20+rnd()*600)));const rate=+(it[3]*bump).toFixed(2);
+  rows.push({VRDATE:d,VRNO:'ISS/'+vr,DEPT_NAME:dep,PLANT_NAME:pl,DIV_CODE:pl==='Plant D'?'WLD':'SML',ITEM_GROUP:it[1],COST_NAME:dep.startsWith('Maint')?'CC-Maintenance':dep==='Utilities'?'CC-Utilities':dep==='QA Lab'?'CC-Quality':rnd()<.03?'':'CC-Production',
+   EQPT_NAME:rnd()<.15?'':pick(eqs),ITEM_CODE:'IT'+String(items.indexOf(it)+1001),ITEM_NAME:it[0],UM:it[2],QTY_ISSUED:q,RATE:rate,VAL_ISSUED:+(q*rate).toFixed(2),BATCH_NO:rnd()<.12?'N.D.':'B'+Math.floor(rnd()*9999)});
+ }
+ start(rows.map(norm),'Sample data');
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VERONICA AI Project Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: Jira-style project hub — fixed left nav of SDLC phases, one working view on the right. Steel-blue engineering palette. */
+:root{
+  --bg:#f3f5f8; --panel:#ffffff; --side:#e9edf3; --ink:#152235; --mut:#5b6a80; --line:#d6dde7;
+  --acc:#1f6fb2; --acc-soft:#e3eefa; --good:#178a55; --warn:#b26b00; --bad:#c23347; --info:#5b4bc4;
+  --display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0c121b; --panel:#121b27; --side:#0f1722; --ink:#e3eaf3; --mut:#93a1b5; --line:#24324a;
+  --acc:#5aa9ec; --acc-soft:#16304a; --good:#3fc985; --warn:#e9a53b; --bad:#f06b80; --info:#a596ff; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0c121b; --panel:#121b27; --side:#0f1722; --ink:#e3eaf3; --mut:#93a1b5; --line:#24324a;
+  --acc:#5aa9ec; --acc-soft:#16304a; --good:#3fc985; --warn:#e9a53b; --bad:#f06b80; --info:#a596ff; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:14px/1.55 var(--body);-webkit-font-smoothing:antialiased}
+a{color:var(--acc)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.app{display:grid;grid-template-columns:240px 1fr;height:100%}
+.side{background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:auto}
+.proj{display:flex;gap:10px;align-items:center;padding:16px 16px 12px;border-bottom:1px solid var(--line)}
+.proj .logo{width:34px;height:34px;border-radius:8px;background:var(--acc);color:#fff;display:grid;place-items:center;font:700 15px var(--display)}
+.proj b{display:block;font:700 15px var(--display);letter-spacing:.02em}
+.proj small{color:var(--mut);font-size:11.5px}
+.nav{padding:8px;display:flex;flex-direction:column;gap:1px}
+.nav .grp{font:600 10.5px var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--mut);padding:12px 10px 4px}
+.nav button{display:flex;align-items:center;gap:10px;border:0;background:none;text-align:left;padding:7px 10px;border-radius:6px;color:var(--ink)}
+.nav button:hover{background:var(--acc-soft)}
+.nav button.on{background:var(--acc-soft);color:var(--acc);font-weight:600;box-shadow:inset 3px 0 0 var(--acc)}
+.nav .n{margin-left:auto;font:500 11px var(--mono);color:var(--mut)}
+.sidefoot{margin-top:auto;padding:12px 16px;border-top:1px solid var(--line);font-size:12px;color:var(--mut);display:flex;justify-content:space-between;align-items:center}
+.tbtn{border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:4px 10px;font-size:12px}
+main{overflow:auto;padding:22px 28px 60px}
+.crumb{font-size:12px;color:var(--mut)}
+h1{font:700 26px/1.2 var(--display);margin:2px 0 4px;text-wrap:balance}
+.lead{color:var(--mut);max-width:72ch;margin:0 0 18px}
+h2{font:700 17px var(--display);margin:24px 0 10px;letter-spacing:.01em}
+h3{font:600 14px var(--body);margin:14px 0 6px}
+p{max-width:78ch}
+.grid{display:grid;gap:12px}
+.g4{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.stat b{display:block;font:700 28px/1.1 var(--display);font-variant-numeric:tabular-nums}
+.stat span{color:var(--mut);font-size:12.5px}
+.tbl{background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font:600 11px var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap;background:var(--panel);position:sticky;top:0}
+td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+tbody tr.click{cursor:pointer}
+tbody tr.click:hover{background:var(--acc-soft)}
+.key{font:500 12px var(--mono);color:var(--acc);white-space:nowrap}
+.mono{font-family:var(--mono);font-size:12.5px}
+.pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11.5px;font-weight:600;white-space:nowrap;border:1px solid transparent}
+.s-done{background:color-mix(in srgb,var(--good) 14%,transparent);color:var(--good)}
+.s-prog{background:color-mix(in srgb,var(--acc) 14%,transparent);color:var(--acc)}
+.s-todo{background:color-mix(in srgb,var(--mut) 16%,transparent);color:var(--mut)}
+.s-open{background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad)}
+.s-review{background:color-mix(in srgb,var(--info) 14%,transparent);color:var(--info)}
+.s-wont{background:transparent;color:var(--mut);border-color:var(--line)}
+.sev{display:inline-flex;align-items:center;gap:6px;font-size:12px;white-space:nowrap}
+.sev i{width:9px;height:9px;border-radius:2px;display:inline-block}
+.sev.Critical i{background:var(--bad)}.sev.Major i{background:var(--warn)}.sev.Minor i{background:var(--acc)}.sev.Trivial i{background:var(--mut)}
+.epic{font-size:11px;font-weight:600;padding:1px 7px;border-radius:4px;background:var(--acc-soft);color:var(--acc);white-space:nowrap}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 12px}
+.bar input,.bar select{border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:6px 10px}
+.bar input{width:240px}
+.board{display:grid;grid-template-columns:repeat(4,minmax(220px,1fr));gap:12px;overflow-x:auto}
+.col{background:var(--side);border:1px solid var(--line);border-radius:8px;padding:10px;min-height:200px}
+.col h4{margin:0 0 8px;font:600 11px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);display:flex;justify-content:space-between}
+.ticket{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:9px 10px;margin-bottom:8px;cursor:pointer}
+.ticket:hover{border-color:var(--acc)}
+.ticket .t{font-size:13px;margin:4px 0 6px}
+.ticket .m{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--mut)}
+.pts{font:500 11px var(--mono);background:var(--side);border-radius:999px;padding:0 7px}
+.timeline{display:grid;gap:10px}
+.sprint{display:grid;grid-template-columns:150px 1fr;gap:16px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.sprint .when{font:600 12px var(--mono);color:var(--mut)}
+.sprint .nm{font:700 16px var(--display)}
+.sprint ul{margin:6px 0 0;padding-left:18px}
+.prog{height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:8px}
+.prog i{display:block;height:100%;background:var(--good)}
+.doc h2{border-bottom:1px solid var(--line);padding-bottom:6px}
+.doc ul,.doc ol{max-width:78ch;padding-left:20px}
+.doc li{margin:3px 0}
+.req{display:grid;grid-template-columns:78px 1fr 92px;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.req:last-child{border-bottom:0}
+.req .p{font-size:11.5px;color:var(--mut);text-align:right}
+.note{border-left:3px solid var(--warn);background:color-mix(in srgb,var(--warn) 8%,transparent);padding:8px 12px;border-radius:0 6px 6px 0;font-size:13px;max-width:80ch}
+svg text{fill:var(--ink);font-family:var(--body)}
+.arch rect{fill:var(--panel);stroke:var(--line)}
+.arch .hl{stroke:var(--acc);stroke-width:1.5}
+.arch line,.arch path{stroke:var(--mut);stroke-width:1.4;fill:none}
+.arch .lbl{font-size:10.5px;fill:var(--mut)}
+.drawer{position:fixed;inset:0;background:rgba(10,16,26,.45);display:flex;justify-content:flex-end;z-index:20}
+.drawer[hidden]{display:none}
+.drawer .pane{width:min(560px,100%);height:100%;background:var(--panel);border-left:1px solid var(--line);padding:20px 22px;overflow:auto}
+.drawer dl{display:grid;grid-template-columns:120px 1fr;gap:6px 12px;font-size:13px;margin:12px 0}
+.drawer dt{color:var(--mut)}
+.drawer dd{margin:0}
+.hist{border-left:2px solid var(--line);margin:8px 0 0 4px;padding-left:12px;font-size:12.5px}
+.hist div{margin-bottom:6px}
+.hist b{font-family:var(--mono);font-weight:500;color:var(--mut);margin-right:6px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mut)}
+.chk{color:var(--good);font-weight:700}
+@media (max-width:820px){
+  .app{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .side{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line)}
+  .proj,.sidefoot,.nav .grp{display:none}
+  .nav{flex-direction:row}
+  .nav button{white-space:nowrap}
+  main{padding:16px}
+  .sprint{grid-template-columns:1fr}
+  .req{grid-template-columns:64px 1fr}
+  .req .p{display:none}
+  .bar input{width:100%}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="proj"><div class="logo">V</div><div><b>VERONICA AI</b><small>Project VRN · Venus Pipes IT</small></div></div>
+    <nav class="nav" id="nav" aria-label="Project sections">
+      <div class="grp">Plan</div>
+      <button data-v="overview">Overview</button>
+      <button data-v="prd">PRD</button>
+      <button data-v="srs">SRS</button>
+      <div class="grp">Build</div>
+      <button data-v="backlog">Backlog &amp; epics<span class="n" id="nStories"></span></button>
+      <button data-v="sprints">Sprints</button>
+      <button data-v="board">Sprint board</button>
+      <div class="grp">Test</div>
+      <button data-v="tests">Test cases<span class="n" id="nTests"></span></button>
+      <button data-v="bugs">Bugs<span class="n" id="nBugs"></span></button>
+      <button data-v="rtm">Traceability</button>
+      <div class="grp">Ship</div>
+      <button data-v="releases">Releases</button>
+      <button data-v="retro">Retrospective</button>
+    </nav>
+    <div class="sidefoot"><span>Updated 31-Oct-2026</span><button class="tbtn" id="theme" type="button">Dark</button></div>
+  </aside>
+  <main id="main"></main>
+</div>
+<div class="drawer" id="drawer" hidden><div class="pane" id="pane" role="dialog" aria-modal="true"></div></div>
+
+<script>
+/* ---------------- project data (from the real build of VERONICA, Oct 2026) ---------------- */
+const EPICS = {
+  E1:"Conversational reporting", E2:"Live dashboards", E3:"Access control & security",
+  E4:"Voice & experience", E5:"Operations & deployment", E6:"Director security hardening"
+};
+const SPRINTS = [
+  {id:"S0",name:"Sprint 0 · Discovery",when:"22–24 Oct",goal:"Agree what to build and how it connects to the ERP.",
+   items:["Problem: HODs wait for IT to export Excel and build reports by hand","Decided: Python FastAPI + Claude agent on a read-only MySQL copy of Oracle ERP","Channel: secure web app; teachable /report skills; multilingual (EN/HI/GU/MR)"]},
+  {id:"S1",name:"Sprint 1 · Core assistant",when:"24–26 Oct",goal:"Ask in plain language, get a correct report back."},
+  {id:"S2",name:"Sprint 2 · Live dashboards",when:"26–28 Oct",goal:"Put the HTML MIS dashboards on live ERP data, with division locks."},
+  {id:"S3",name:"Sprint 3 · Speed & trust",when:"28–29 Oct",goal:"Fast Sales Order dashboard, data proof, Issue dashboard, reliable sync."},
+  {id:"S4",name:"Sprint 4 · Security & RBAC",when:"29–30 Oct",goal:"Close the open-link gap, audit every denial, let admins manage rights."},
+  {id:"S5",name:"Sprint 5 · Admin console & stability",when:"30–31 Oct",goal:"One clean admin console; fix restart and slow-voice problems."},
+  {id:"S6",name:"Sprint 6 · Director hardening",when:"Next",goal:"Dedicated LAN server, VPN, Google Authenticator 2FA, nothing stored outside."}
+];
+// [key, epic, title, points, sprint, status, acceptance]
+const STORIES = [
+ ["VRN-1","E1","As an HOD, I ask a question in plain language and get the answer from ERP data",8,"S1","Done","Read-only SQL only; DELETE/UPDATE/INTO OUTFILE refused; totals match a direct SQL"],
+ ["VRN-2","E1","As an admin, I teach a report once and anyone allowed can run it as /reportname",5,"S1","Done","Skill saved with SQL + rules; runs with new dates"],
+ ["VRN-3","E1","As a user, I get the report as Excel, HTML and PDF",5,"S1","Done","Indian number format; PDF skipped gracefully if GTK missing"],
+ ["VRN-4","E4","As a user, I sign in to a web assistant branded VERONICA",8,"S1","Done","Password login, lockout after repeated failures, sessions"],
+ ["VRN-6","E1","As a user, I can find and re-open past reports",3,"S1","Done","Keyword search of report history"],
+ ["VRN-7","E4","As a user, VERONICA answers in an Indian female voice",5,"S1","Done","Gemini TTS, cached; spoken style for voice questions"],
+ ["VRN-8","E2","As production management, I see the Scrap MIS dashboard live",8,"S2","Done","Welded + Seamless views; matches the HTML generator's rules"],
+ ["VRN-9","E2","As QC, I see Final Production / Rejection live (template v13)",5,"S2","Done","Prod Nos / Prod MTR columns; v11 retired"],
+ ["VRN-10","E2","As production, I see Jobcard-wise Scrap live",5,"S2","Done","Engine rules equal the dashboard rules"],
+ ["VRN-11","E2","As sales management, I see the Sales Order MIS live (mark5)",8,"S2","Done","Column aliases for the ERP view; KG figures match V6 file"],
+ ["VRN-12","E3","As an admin, I give each department a role and lock U2 users to Seamless data",5,"S2","Done","Division lock applies to answers, reports and dashboards"],
+ ["VRN-13","E2","As a user, dashboards open without waiting for the AI",3,"S2","Done","Fast path routes period words straight to the engine"],
+ ["VRN-14","E4","As a user, I still hear a voice when Gemini's daily limit is used up",3,"S2","Done","Offline Kokoro voice as backup"],
+ ["VRN-15","E4","As an admin, I choose which screen themes each person may use",3,"S2","Done","Aurora, Arc, Holo, Nova, Forge, Titan, Atlas"],
+ ["VRN-16","E1","As a user, I can ask on WhatsApp",3,"S2","Done","Signed webhook; callback URL must follow the tunnel"],
+ ["VRN-17","E2","As sales management, the Sales Order dashboard opens in seconds",5,"S3","Done","Order-book cache 15 min, stale-while-revalidate 2 h, 240 s query limit"],
+ ["VRN-18","E1","As management, I see how a number was calculated (data proof)",5,"S3","Done","Independent SQL shown; 🔎 Proof button on the dashboard"],
+ ["VRN-19","E4","As admin / manager, I can switch the hand-gesture camera on and off and move it",2,"S3","Done","Draggable window, bottom-centre by default"],
+ ["VRN-20","E2","As costing, I see the Issue dashboard with plant-wise access",8,"S3","Done","VIEW_ISSUE_ENGINE_PBI; 60,545 rows; 16 plants; template v4"],
+ ["VRN-21","E5","As IT, the Oracle → MySQL sync retries and a missing view shows a calm notice",3,"S3","Done","4 retries × 60 s; card hidden from non-admins until synced"],
+ ["VRN-22","E1","VERONICA knows who the company people are",1,"S3","Done","knowledge/people.md"],
+ ["VRN-23","E2","As admin / manager, I see Monthwise Sales Dispatch",5,"S4","Done","VIEW_SALE_INVOICE_PBI; FY to date by default"],
+ ["VRN-24","E4","Hologram Lab: explode / assemble spool, fittings and jet by hand gesture",5,"S4","Done","Test build only, not in VERONICA"],
+ ["VRN-25","E3","As IT, report files can't be opened by anyone who just has the link",3,"S4","Done","HMAC-signed links, expire after 7 days"],
+ ["VRN-26","E3","As an admin, every refused request is logged and I'm alerted",5,"S4","Done","rb_security_events + logs/security.log; throttled e-mail alert"],
+ ["VRN-27","E3","As an admin, I manage users, roles, views and report access from the screen",8,"S4","Done","Last-admin and self protections; every change audited"],
+ ["VRN-29","E3","Charts, Excel export and fonts load from our own server",3,"S4","Done","0 internet requests from any dashboard"],
+ ["VRN-30","E3","One dedicated Admin Console, top-right, admins only",5,"S5","Done","Overview, Users, Division & plants, Looks, Roles, Report access, Security log; light/dark"],
+ ["VRN-31","E5","RESTART_VERONICA.bat waits until VERONICA is really up",2,"S5","Done","Checks every 10 s for 2 min"],
+ ["VRN-32","E4","Offline voice must not slow the server",2,"S5","Done","2 CPU cores, first ~220 characters, skip if already speaking"],
+ ["VRN-33","E6","As an employee, I sign in with Google Authenticator as a second step",5,"S6","To Do","TOTP 6-digit code; recovery codes for admins"],
+ ["VRN-34","E6","VERONICA runs on a dedicated PC on the office LAN IP",5,"S6","To Do","No public tunnel; Windows service; nightly backup"],
+ ["VRN-35","E6","Outside users reach VERONICA only through the company VPN",3,"S6","To Do","Set up by network team; firewall allows VPN range only"],
+ ["VRN-36","E3","Remove the hard-coded DB password from a tool script",1,"S6","Done","Script reads .env"],
+ ["VRN-37","E6","Security note for the director: what leaves the building and what doesn't",1,"S6","In Review","Covers Claude API retention, Gemini voice, VPN, 2FA"],
+ ["VRN-38","E5","Send Sales Dispatch check output and confirm column mapping",1,"S6","To Do","DISPATCH_CHECK.bat run by IT"],
+ ["VRN-39","E1","Search an SOP / QC document library (local RAG) when documents are added",5,"Backlog","To Do","Only if large document sets are added"]
+];
+// [key, title, severity, status, sprint, found where, root cause, fix, history]
+const BUGS = [
+ ["BUG-1","Sales Order dashboard figures differ from the V6 Excel file","Major","Done","S3","UAT by IT","ERP view column names differ from the export (e.g. UNITOFMEASURE vs UOM); some fields were not picked up","Column aliases and unit / status normalisers in the engine; KG totals now match V6"],
+ ["BUG-2","Sandeep gets an error on Scrap MIS","Major","Done","S3","User report","U1-locked role had a deny rule on the shared Seamless view used by the combined dashboard","Locked users may read the shared view; division filter still applied"],
+ ["BUG-3","Sales Order dashboard takes 40–104 s and times out","Critical","Done","S3","User report","Full order book (64,179 rows) fetched on every open; 30 s query limit","Order-book cache with background refresh; engine query limit 240 s; warm-up at start"],
+ ["BUG-4","Data-proof SQL fails on mixed date formats","Minor","Done","S3","Developer test","Dates stored as text in several formats","CASE + REGEXP date parsing; tested on MariaDB"],
+ ["BUG-5","Some deployed files didn't reach the PC","Major","Done","S3","md5 check after deploy","File commit ran before the copy finished","Copy first, then commit; verify every file's md5"],
+ ["BUG-6","VERONICA stops answering after restart","Major","Done","S3","User report","Restart needs admin rights; the free quick tunnel died and its URL changed","Self-elevating restart; NEW_LINK_NOW.bat sets a fresh link"],
+ ["BUG-7","No reply on WhatsApp","Major","Open","S4","User report","Meta callback URL still pointed to an old tunnel URL","Updated by hand in Meta. Lasting fix: fixed address (LAN + VPN, VRN-34/35)"],
+ ["BUG-8","\"VIEW_ISSUE_ENGINE_PBI not found\" shown to management","Critical","Done","S3","Management demo","View never synced: Oracle ORA-12170 timeouts, manual run stopped early","Synced 60,545 rows; sync retries; calm notice page; card hidden until data exists"],
+ ["BUG-9","Dashboards hidden in tests for missing views","Minor","Done","S3","Automated tests","Missing-view check read table names from the rules text","Check only the skill's source view"],
+ ["BUG-10","Hologram explode too large, glow too bright","Trivial","Done","S4","Owner review","Fixed scale for every model","Scale by bounding sphere; bloom 0.72"],
+ ["BUG-11","Report files opened by anyone with the tunnel link, no login","Critical","Done","S4","Security review","/files served without a check","HMAC-signed links that expire after 7 days"],
+ ["BUG-12","Signed report links fail inside the web app","Major","Done","S4","Code review","Web UI stripped the ?e=&s= signature from file URLs","Keep the query string when building file links"],
+ ["BUG-13","Admin button visible to managers","Major","Done","S5","Browser test before release","CSS display rule overrode the hidden attribute","Explicit [hidden] rule; manager login re-tested"],
+ ["BUG-14","Delete buttons cut off in the users table","Trivial","Done","S5","Screenshot review","Table wider than the console","Narrower name and e-mail fields; icon delete button"],
+ ["BUG-15","Restart window says \"not answering\" although VERONICA started","Minor","Done","S5","User report","One health check after 20 s while the order book was still loading","Check every 10 s for up to 2 minutes"],
+ ["BUG-16","Answers take minutes; VERONICA looks offline","Critical","Done","S5","User report","Gemini voice limit reached → offline voice used every CPU core (153–238 s per reply)","Offline voice limited to 2 cores and ~220 characters; skips if already speaking"],
+ ["BUG-19","Admin-console test failed to sign in","Trivial","Done","S4","Automated tests","An earlier test locked the test client's IP on purpose","Clear the lockout before the test"],
+ ["BUG-21","Hard-coded DB password in jobcard_scrap_verify.py","Major","Open","S6","Code review","Verification script written before .env was used","Read credentials from .env"],
+ ["BUG-22","Sales Order total 234k higher than V6","Minor","Won't fix","S3","UAT by IT","V6 adds pieces (Nos) into the same total; KG figures already matched","By design: units are kept separate"]
+];
+// test catalogue — automated suite tests/test_flow.py (all pass, last run 31-Oct-2026) + manual UAT
+const TESTS = [
+ ["TC-01","test_sql_guard","SQL guard blocks DELETE, UPDATE, multi-statement and INTO OUTFILE","FR-01","Security"],
+ ["TC-02","test_indian_numbers","Numbers formatted in lakhs / crores","FR-03","Unit"],
+ ["TC-03","test_teach_then_run_with_all_formats","Teach a skill, run it, get Excel + HTML + PDF","FR-02","Integration"],
+ ["TC-04","test_viewer_cannot_free_query_or_teach","Viewer role can't ask free questions or teach","FR-05","Security"],
+ ["TC-05","test_schedule_creation","Scheduled report created and delivered by e-mail","FR-08","Integration"],
+ ["TC-06","test_web_login_and_api","Web login, session, protected API","FR-05","Integration"],
+ ["TC-07","test_lockout_and_disable","Lockout after wrong passwords; disabled user blocked","NFR-02","Security"],
+ ["TC-08","test_password_rules_and_upgrade","Password length rule; hash upgrade","NFR-02","Security"],
+ ["TC-09","test_seamless_production_pack","Seamless production report pack","FR-04","Integration"],
+ ["TC-10","test_new_tables_appear_without_restart","New ERP views visible without restart","FR-01","Integration"],
+ ["TC-11","test_run_skill_query_tool_is_safe","Skill query tool can't escape its views","FR-05","Security"],
+ ["TC-12","test_voice_web_endpoints_and_cache","Voice endpoint and cache","FR-09","Integration"],
+ ["TC-14","test_pdf_skipped_gracefully_without_gtk","PDF skipped with a message if GTK missing","FR-03","Unit"],
+ ["TC-15","test_spoken_messages_get_spoken_style_instruction","Spoken questions get spoken-style answers","FR-09","Unit"],
+ ["TC-16","test_voice_falls_back_when_gemini_busy","Offline voice used when Gemini is busy","FR-09","Integration"],
+ ["TC-17","test_live_voice_bridge_with_tool_call","Live voice can run a report tool","FR-09","Integration"],
+ ["TC-18","test_final_production_engine_matches_dashboard_rules","Final Production engine = dashboard rules","FR-04","Data"],
+ ["TC-19","test_final_production_real_view_shape","Final Production works on the real view shape","FR-04","Data"],
+ ["TC-20","test_jobcard_scrap_engine_rules_and_dashboard","Jobcard scrap engine and dashboard","FR-04","Data"],
+ ["TC-21","test_private_view_blocked_for_non_admin","Private views hidden from non-admins","FR-05","Security"],
+ ["TC-22","test_live_dashboard_links","Live dashboard links per user","FR-04","Integration"],
+ ["TC-23","test_stream_events_calculate_and_followups","Streaming answer, calculator, follow-ups","FR-01","Integration"],
+ ["TC-24","test_department_roles","Department roles see only their reports","FR-05","Security"],
+ ["TC-25","test_combined_role","Combined role gets both departments","FR-05","Security"],
+ ["TC-26","test_export_users","Users export to Excel","FR-11","Unit"],
+ ["TC-27","test_delete_user","Delete user keeps reports for audit","FR-11","Integration"],
+ ["TC-28","test_scrap_mis_engine","Scrap MIS engine totals","FR-04","Data"],
+ ["TC-29","test_division_lock_u2_only","U2-locked user never sees U1 data","FR-06","Security"],
+ ["TC-30","test_scrap_mis_welded_view","Scrap MIS welded view","FR-04","Data"],
+ ["TC-31","test_scrap_mis_text_dates","Scrap MIS with text dates","FR-04","Data"],
+ ["TC-32","test_sales_order_engine","Sales Order engine, cache and proof","FR-04","Data"],
+ ["TC-33","test_send_files_confirm_and_privacy","Sending files asks first; no sending to people without rights","FR-08","Security"],
+ ["TC-34","test_whatsapp_webhook","WhatsApp webhook signature","FR-10","Security"],
+ ["TC-35","test_fast_path_period_and_routing","Fast path understands periods and routes","FR-04","Unit"],
+ ["TC-36","test_fast_path_runs_engine_without_ai","Dashboard opens without the AI","NFR-01","Performance"],
+ ["TC-37","test_upload_and_attachment_tools","Upload Excel and read it","FR-01","Integration"],
+ ["TC-38","test_attachment_reaches_the_model","Attachment reaches the model","FR-01","Integration"],
+ ["TC-39","test_boss_greeting_for_admin","Admin sign-in greeting","FR-09","Unit"],
+ ["TC-40","test_creator_answer","Answers who built VERONICA","FR-01","Unit"],
+ ["TC-41","test_user_themes_admin_and_me","Per-user themes","FR-11","Integration"],
+ ["TC-42","test_dash_custom_range","Dashboard custom date range","FR-04","Integration"],
+ ["TC-43","test_rename_username","Rename usernames","FR-11","Unit"],
+ ["TC-44","test_scrap_line_lock","Scrap plant lock per user","FR-06","Security"],
+ ["TC-45","test_scrap_u1_lock_reads_shared_seamless_view","U1 user can open the combined Scrap dashboard","FR-06","Regression"],
+ ["TC-46","test_issue_engine_division_and_plant_lock","Issue dashboard division + plant lock","FR-06","Security"],
+ ["TC-47","test_dashboard_waits_for_unsynced_view","Calm notice when a view isn't synced","NFR-03","Regression"],
+ ["TC-48","test_sales_dispatch_dashboard_admin_manager_only","Sales Dispatch only for admin / manager","FR-05","Security"],
+ ["TC-49","test_file_links_are_signed_and_expire","File links signed and expire","FR-12","Security"],
+ ["TC-50","test_access_denied_is_logged_and_admins_alerted","Denials logged, admins alerted","FR-10","Security"],
+ ["TC-51","test_access_control_console_admin_only_and_audited","Admin console API: admin only, audited","FR-11","Security"],
+ ["TC-52","test_dashboard_libraries_served_locally","No internet libraries in any page","NFR-04","Security"],
+ ["TC-53","test_times_are_india_time","All times shown in India time (IST)","NFR-05","Regression"],
+ ["TC-54","test_shared_dashboard_link_needs_sign_in","Forwarded dashboard link needs sign-in as its owner","FR-12","Security"],
+ ["TC-55","test_denied_reply_is_flagged_for_red_alert","Refused answer turns the screen red","FR-10","Integration"],
+ ["TC-56","test_denied_message_never_explains","Refusal never explains role or views","FR-10","Security"],
+ ["TC-57","test_admin_controls_who_gets_security_alerts","Admin decides who gets security alerts","FR-11","Security"]
+];
+// manual UAT [key, title, req, result, note]
+const UAT = [
+ ["UAT-01","Admin Console button shows for admin, hidden for manager","FR-11","Pass","Browser test, 30-Oct"],
+ ["UAT-02","All 6 dashboards load with internet blocked","NFR-04","Pass","0 external requests, 0 errors"],
+ ["UAT-03","Create user from console, then sign in","FR-11","Pass","Test copy, 30-Oct"],
+ ["UAT-04","Restart file shows \"VERONICA is UP\"","NFR-03","Pass","Started 23:31:13, health OK 23:31:35"],
+ ["UAT-05","Sales Order totals match V6 Excel (KG)","FR-04","Pass","After column aliases"],
+ ["UAT-06","Issue dashboard opens for management","FR-04","Pass","After sync of 60,545 rows"],
+ ["UAT-07","Sign-in with Google Authenticator code","NFR-02","Not run","Waiting for VRN-33"],
+ ["UAT-08","Outside user reaches VERONICA only over VPN","NFR-02","Not run","Waiting for VRN-35"]
+];
+const FR = [
+ ["FR-01","Answer plain-language questions (English, Hindi, Gujarati, Marathi) from the ERP copy using read-only SQL","Must"],
+ ["FR-02","Let permitted users teach a report once and re-run it as /reportname with new dates","Must"],
+ ["FR-03","Deliver reports as Excel, HTML and PDF with Indian number format (₹, lakh, crore, MT)","Must"],
+ ["FR-04","Serve live dashboards: Scrap MIS, Final Production / Rejection, Jobcard Scrap, Sales Order MIS, Issue / Costing, Sales Dispatch","Must"],
+ ["FR-05","Role-based access: each role lists the ERP views it may read and the reports it may run","Must"],
+ ["FR-06","Division lock (U1 Welded / U2 Seamless) and plant locks per user, applied to every answer and dashboard","Must"],
+ ["FR-07","Keep report history and let users search and reopen past reports","Should"],
+ ["FR-08","Schedule reports and send them by e-mail, asking before sending","Should"],
+ ["FR-09","Speak answers in an Indian female voice, with an offline backup voice","Could"],
+ ["FR-10","Log every refused request and alert admins; verify WhatsApp webhook signatures","Must"],
+ ["FR-11","Admin console to manage users, roles, views, report access, division / plants, looks and the security log","Must"],
+ ["FR-12","Report file links signed and expiring (7 days)","Must"],
+ ["FR-13","Show the SQL used to reach a number (data proof)","Should"]
+];
+const NFR = [
+ ["NFR-01","Performance","Chat answer in 10–20 s; dashboards from cache in a few seconds; engine queries up to 240 s"],
+ ["NFR-02","Security","Read-only DB user; passwords ≥ 8 characters with lockout; sessions end on role change; secrets only in .env; 2FA and VPN planned"],
+ ["NFR-03","Availability","Runs as a Windows scheduled task; restart verified by health check; calm notice page instead of raw errors"],
+ ["NFR-04","Privacy / offline","No CDN or Google Fonts; ERP data stays on the company server; only the question and needed rows go to the Claude API"],
+ ["NFR-05","Usability","Works on laptop and phone; light and dark looks; answers in the user's language"],
+ ["NFR-06","Maintainability","Automated test suite (all passing); every deploy backed up and md5-verified"]
+];
+const RELEASES = [
+ ["v1.0","26-Oct","Core assistant","Plain-language reports, teachable skills, Excel/HTML/PDF, web login, Gemini voice"],
+ ["v1.1","28-Oct","Live dashboards","Scrap MIS, Final Production, Jobcard Scrap, Sales Order MIS; division lock; offline voice; themes; WhatsApp"],
+ ["v1.2","29-Oct","Speed & trust","Sales Order cache; data proof; Issue dashboard with plant lock; sync retry; camera gestures; Final Production v13"],
+ ["v1.3","30-Oct","Security & RBAC","Signed file links; access-denied log and alerts; RBAC API; local libraries; Sales Dispatch"],
+ ["v1.4","30-Oct","Admin Console","Dedicated admin console with light/dark; restart that waits for health"],
+ ["v1.4.1","30-Oct","Hotfix","Offline voice limited to 2 cores"]
+];
+
+/* ---------------- helpers ---------------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const stCls = s => ({"Done":"s-done","In Progress":"s-prog","In Review":"s-review","To Do":"s-todo","Open":"s-open","Won't fix":"s-wont","Pass":"s-done","Not run":"s-todo"}[s] || "s-todo");
+const pill = s => `<span class="pill ${stCls(s)}">${esc(s)}</span>`;
+const sev = s => `<span class="sev ${s}"><i></i>${s}</span>`;
+const sprintName = id => (SPRINTS.find(s => s.id === id) || {name:id}).name;
+const ptsOf = sid => STORIES.filter(s => s[4] === sid).reduce((a, s) => a + s[3], 0);
+const donePts = sid => STORIES.filter(s => s[4] === sid && s[5] === "Done").reduce((a, s) => a + s[3], 0);
+const testsFor = r => TESTS.filter(t => t[3] === r);
+
+/* ---------------- views ---------------- */
+const V = {};
+V.overview = () => {
+  const open = BUGS.filter(b => b[3] === "Open").length;
+  const done = STORIES.filter(s => s[5] === "Done").length;
+  return `<div class="crumb">VRN / Overview</div><h1>VERONICA AI</h1>
+  <p class="lead">An AI reporting assistant for Venus Pipes &amp; Tubes. Managers ask in plain language and get reports and live dashboards straight from ERP data, within the access their role allows. Built in-house by the IT team, 22–31 October 2026, in six short sprints.</p>
+  <div class="grid g4">
+    <div class="card stat"><b>${done}/${STORIES.length}</b><span>user stories done</span></div>
+    <div class="card stat"><b>${STORIES.filter(s=>s[5]==="Done").reduce((a,s)=>a+s[3],0)}</b><span>story points delivered</span></div>
+    <div class="card stat"><b>${TESTS.length}/${TESTS.length}</b><span>automated tests passing</span></div>
+    <div class="card stat"><b>${BUGS.length}</b><span>bugs logged · ${open} open</span></div>
+    <div class="card stat"><b>6</b><span>live dashboards</span></div>
+    <div class="card stat"><b>v1.4.1</b><span>current release</span></div>
+  </div>
+  <h2>Team &amp; stakeholders</h2>
+  <div class="tbl"><table><thead><tr><th>Person</th><th>Role in project</th><th>Scrum role</th></tr></thead><tbody>
+    <tr><td>Mr. Dhruv Patel</td><td>Director</td><td>Sponsor · sets security requirements</td></tr>
+    <tr><td>Mr. Dwarika Gupta</td><td>IT Sr Manager</td><td>Stakeholder · approvals</td></tr>
+    <tr><td>Shubham Kakde</td><td>Asst Manager IT · creator of VERONICA</td><td>Product owner &amp; lead developer</td></tr>
+    <tr><td>Subrat</td><td>Asst Manager IT</td><td>IT support · UAT</td></tr>
+    <tr><td>KK</td><td>Sr Executive IT</td><td>IT support · UAT</td></tr>
+    <tr><td>Claude (AI)</td><td>AI pair developer</td><td>Development, tests, deploy scripts</td></tr>
+    <tr><td>HODs &amp; managers</td><td>Sales, production, QC, costing</td><td>End users · feedback</td></tr>
+  </tbody></table></div>
+  <h2>Where we are</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Done this week</h3><ul style="margin:0;padding-left:18px">
+      <li>Admin Console replaces three separate admin windows</li>
+      <li>All chart and font libraries served from our own server</li>
+      <li>Shared links need sign-in; polite red-alert access denial</li>
+      <li>Slow-voice problem fixed (answers back to seconds)</li></ul></div>
+    <div class="card"><h3>Next: director's security asks</h3><ul style="margin:0;padding-left:18px">
+      <li>Dedicated PC on the office LAN IP (VRN-34)</li>
+      <li>VPN for outside users (VRN-35)</li>
+      <li>Google Authenticator 2-factor sign-in (VRN-33)</li>
+      <li>Security note: what leaves the building (VRN-37)</li></ul></div>
+  </div>`;
+};
+V.prd = () => `<div class="crumb">VRN / Plan / PRD</div><h1>Product Requirements Document</h1>
+  <p class="lead">Version 1.4 · Owner: Shubham Kakde · Status: approved for internal use</p>
+  <div class="doc">
+  <h2>1. Problem</h2>
+  <p>HODs and management depend on IT to export ERP data to Excel and build MIS reports by hand. A report takes hours to arrive, numbers differ between versions, and dashboards need a manual upload every time.</p>
+  <h2>2. Goals</h2>
+  <ol><li>Any permitted manager gets a correct report in under a minute by asking in plain language.</li>
+  <li>The six MIS dashboards run on live ERP data with no manual upload.</li>
+  <li>Each person sees only their department, division and plants.</li>
+  <li>Company data stays on company systems; every refused request is recorded.</li></ol>
+  <h2>3. Personas</h2>
+  <div class="tbl"><table><thead><tr><th>Persona</th><th>Needs</th><th>Access</th></tr></thead><tbody>
+  <tr><td>Director</td><td>Trusted numbers, data security</td><td>Everything (admin)</td></tr>
+  <tr><td>Sales / production manager</td><td>Daily orders, dispatch, scrap, production</td><td>Manager role, all divisions</td></tr>
+  <tr><td>Division user (e.g. Seamless)</td><td>Own division's reports only</td><td>Department role + U2 lock</td></tr>
+  <tr><td>Production / QC staff</td><td>Production and rejection reports</td><td>Production role, no sales views</td></tr>
+  <tr><td>IT admin</td><td>Manage users and rights, audit</td><td>Admin role, Admin Console</td></tr></tbody></table></div>
+  <h2>4. Scope</h2>
+  <div class="grid g2"><div class="card"><h3>In scope</h3><ul style="margin:0;padding-left:18px"><li>Web assistant with sign-in</li><li>Plain-language reports and teachable /report skills</li><li>Six live dashboards</li><li>Roles, division and plant locks, Admin Console</li><li>E-mail delivery and schedules</li><li>Voice answers</li></ul></div>
+  <div class="card"><h3>Out of scope</h3><ul style="margin:0;padding-left:18px"><li>Writing back to the ERP (read-only by design)</li><li>Chat apps outside the company network</li><li>Public internet access after S6 (LAN + VPN only)</li><li>Document search (later, VRN-39)</li></ul></div></div>
+  <h2>5. Success metrics</h2>
+  <div class="tbl"><table><thead><tr><th>Metric</th><th>Target</th><th>Now</th></tr></thead><tbody>
+  <tr><td>Time to answer a report question</td><td>≤ 20 s</td><td>10–20 s (voice off)</td></tr>
+  <tr><td>Dashboard totals vs ERP / reference file</td><td>100% match</td><td>Match (KG, Sales Order vs V6)</td></tr>
+  <tr><td>Requests outside a user's rights shown data</td><td>0</td><td>0 (all logged)</td></tr>
+  <tr><td>Pages loading files from the internet</td><td>0</td><td>0</td></tr>
+  <tr><td>Automated tests passing</td><td>100%</td><td>${TESTS.length}/${TESTS.length}</td></tr></tbody></table></div>
+  <h2>6. Release plan</h2>
+  <p>v1.0 core → v1.1 dashboards → v1.2 speed and trust → v1.3 security and RBAC → v1.4 Admin Console → v2.0 director hardening (LAN server, VPN, 2FA).</p>
+  </div>`;
+V.srs = () => `<div class="crumb">VRN / Plan / SRS</div><h1>Software Requirements Specification</h1>
+  <p class="lead">IEEE-830 style. Priorities use MoSCoW (Must / Should / Could). Each requirement links to its test cases in Traceability.</p>
+  <div class="doc">
+  <h2>1. System overview</h2>
+  <svg class="arch" viewBox="0 0 900 250" width="100%" role="img" aria-label="Architecture: Oracle ERP synced to a read-only MySQL copy, read by the VERONICA server, which calls the Claude API and serves the web app, dashboards and e-mail">
+    <rect x="10" y="95" width="130" height="60" rx="6"/><text x="75" y="122" text-anchor="middle" font-weight="600">Oracle ERP</text><text x="75" y="140" text-anchor="middle" class="lbl">source of truth</text>
+    <rect x="190" y="95" width="150" height="60" rx="6"/><text x="265" y="122" text-anchor="middle" font-weight="600">MySQL copy</text><text x="265" y="140" text-anchor="middle" class="lbl">PBI views · read-only user</text>
+    <rect class="hl" x="390" y="70" width="190" height="110" rx="6"/><text x="485" y="96" text-anchor="middle" font-weight="700">VERONICA server</text>
+    <text x="485" y="116" text-anchor="middle" class="lbl">FastAPI · agent · SQL guard</text><text x="485" y="132" text-anchor="middle" class="lbl">6 dashboard engines · RBAC</text><text x="485" y="148" text-anchor="middle" class="lbl">security log · scheduler</text><text x="485" y="164" text-anchor="middle" class="lbl">local libraries &amp; fonts</text>
+    <rect x="640" y="10" width="160" height="50" rx="6"/><text x="720" y="32" text-anchor="middle" font-weight="600">Claude API</text><text x="720" y="48" text-anchor="middle" class="lbl">reasoning · writes SQL</text>
+    <rect x="640" y="100" width="160" height="50" rx="6"/><text x="720" y="122" text-anchor="middle" font-weight="600">Web app</text><text x="720" y="138" text-anchor="middle" class="lbl">chat · dashboards · console</text>
+    <rect x="640" y="190" width="160" height="50" rx="6"/><text x="720" y="212" text-anchor="middle" font-weight="600">E-mail</text><text x="720" y="228" text-anchor="middle" class="lbl">reports · alerts</text>
+    <line x1="140" y1="125" x2="190" y2="125"/><text x="165" y="115" text-anchor="middle" class="lbl">sync</text>
+    <line x1="340" y1="125" x2="390" y2="125"/>
+    <path d="M580 95 L640 40"/><line x1="580" y1="125" x2="640" y2="125"/><path d="M580 155 L640 212"/>
+  </svg>
+  <h2>2. Functional requirements</h2>
+  <div class="card">${FR.map(r => `<div class="req"><span class="key">${r[0]}</span><span>${esc(r[1])}</span><span class="p">${r[2]} · ${testsFor(r[0]).length} tests</span></div>`).join("")}</div>
+  <h2>3. Non-functional requirements</h2>
+  <div class="tbl"><table><thead><tr><th>ID</th><th>Area</th><th>Requirement</th></tr></thead><tbody>${NFR.map(r => `<tr><td class="key">${r[0]}</td><td>${r[1]}</td><td>${esc(r[2])}</td></tr>`).join("")}</tbody></table></div>
+  <h2>4. Access model (RBAC)</h2>
+  <div class="tbl"><table><thead><tr><th>Role</th><th>ERP views</th><th>Free questions</th><th>Teach</th><th>Schedule</th><th>Console</th></tr></thead><tbody>
+  <tr><td>admin</td><td>All</td><td class="chk">✓</td><td class="chk">✓</td><td class="chk">✓</td><td class="chk">✓</td></tr>
+  <tr><td>manager</td><td>All (non-private)</td><td class="chk">✓</td><td class="chk">✓</td><td class="chk">✓</td><td>–</td></tr>
+  <tr><td>department roles</td><td>Own department views</td><td>per role</td><td>–</td><td>per role</td><td>–</td></tr>
+  <tr><td>viewer</td><td>Taught reports only</td><td>–</td><td>–</td><td>–</td><td>–</td></tr></tbody></table></div>
+  <p>Per user on top of the role: division lock (U1 / U2) and plant lists for Scrap MIS and the Issue dashboard. A role change signs the person out.</p>
+  <h2>5. Data stores</h2>
+  <ul><li><b>ERP copy (MySQL):</b> VIEW_SALES_ORDER_PBI, VIEW_SALE_INVOICE_PBI, VIEW_ISSUE_ENGINE_PBI, VIEW_FINAL_PROD_PBI, scrap views. Read-only user.</li>
+  <li><b>VERONICA DB:</b> users, roles, skills, reports, schedules, sessions, rb_security_events.</li>
+  <li><b>Files:</b> generated reports (signed links, 7 days), logs/server.log, logs/security.log.</li></ul>
+  <h2>6. Interfaces</h2>
+  <ul><li>Web UI and REST API (FastAPI), streaming chat</li><li>Claude API (Anthropic) for reasoning; Gemini for voice (optional)</li><li>SMTP for e-mail; WhatsApp Cloud API webhook (signed)</li></ul>
+  <h2>7. Constraints</h2>
+  <ul><li>Windows PC, no Docker; started by a scheduled task</li><li>Never writes to the ERP</li><li>Secrets only in .env, never in code or chat</li></ul>
+  </div>`;
+V.backlog = () => {
+  return `<div class="crumb">VRN / Build / Backlog</div><h1>Backlog &amp; epics</h1>
+  <p class="lead">Every user story with its epic, size in story points, sprint and acceptance criteria. Click a story for details.</p>
+  <div class="grid g4" style="margin-bottom:14px">${Object.entries(EPICS).map(([k,v]) => { const s = STORIES.filter(x => x[1]===k), d = s.filter(x => x[5]==="Done");
+    return `<div class="card"><span class="epic">${k}</span><div style="font-weight:600;margin:6px 0 2px">${v}</div><div class="crumb">${d.length}/${s.length} stories done</div><div class="prog"><i style="width:${s.length?Math.round(d.length/s.length*100):0}%"></i></div></div>`; }).join("")}</div>
+  <div class="bar"><input id="bq" type="search" placeholder="Search stories" aria-label="Search stories"><select id="be" aria-label="Epic"><option value="">All epics</option>${Object.entries(EPICS).map(([k,v])=>`<option value="${k}">${k} · ${v}</option>`).join("")}</select>
+  <select id="bs" aria-label="Status"><option value="">All statuses</option><option>Done</option><option>In Progress</option><option>In Review</option><option>To Do</option></select></div>
+  <div class="tbl"><table><thead><tr><th>Key</th><th>Story</th><th>Epic</th><th>Pts</th><th>Sprint</th><th>Status</th></tr></thead><tbody id="btb"></tbody></table></div>`;
+};
+function fillBacklog(){
+  const q = ($("#bq").value||"").toLowerCase(), e = $("#be").value, s = $("#bs").value;
+  $("#btb").innerHTML = STORIES.filter(r => (!q || (r[0]+" "+r[2]).toLowerCase().includes(q)) && (!e || r[1]===e) && (!s || r[5]===s))
+    .map(r => `<tr class="click" data-story="${r[0]}"><td class="key">${r[0]}</td><td>${esc(r[2])}</td><td><span class="epic">${r[1]}</span></td><td class="mono">${r[3]}</td><td class="mono">${r[4]}</td><td>${pill(r[5])}</td></tr>`).join("")
+    || `<tr><td colspan="6" class="crumb">No story matches.</td></tr>`;
+}
+V.sprints = () => {
+  const sp = SPRINTS.filter(s => s.id !== "S0"), max = Math.max(...sp.map(s => ptsOf(s.id)));
+  const W = 640, H = 200, bw = 56, gap = (W - 60 - sp.length*bw) / (sp.length-1);
+  const bars = sp.map((s,i) => { const x = 50 + i*(bw+gap), t = ptsOf(s.id), d = donePts(s.id), ht = t/max*140, hd = d/max*140;
+    return `<rect x="${x}" y="${170-ht}" width="${bw}" height="${ht}" rx="3" fill="var(--line)"/><rect x="${x}" y="${170-hd}" width="${bw}" height="${hd}" rx="3" fill="var(--acc)"/>
+    <text x="${x+bw/2}" y="${165-ht}" text-anchor="middle" font-size="11" font-weight="600">${d}/${t}</text><text x="${x+bw/2}" y="188" text-anchor="middle" font-size="11" fill="var(--mut)">${s.id}</text>`; }).join("");
+  return `<div class="crumb">VRN / Build / Sprints</div><h1>Sprints</h1>
+  <p class="lead">Two-day sprints. Each ended with a deploy to the office PC (backup → copy → md5 check → restart) and a review with the product owner.</p>
+  <div class="card"><h3 style="margin-top:0">Velocity: story points done / planned</h3>
+  <svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px" role="img" aria-label="Velocity chart">
+    <line x1="40" y1="170" x2="${W-5}" y2="170" stroke="var(--line)"/>${bars}</svg>
+  <div class="legend"><span><i style="display:inline-block;width:10px;height:10px;background:var(--acc);border-radius:2px"></i> done</span><span><i style="display:inline-block;width:10px;height:10px;background:var(--line);border-radius:2px"></i> planned</span></div></div>
+  <h2>Sprint history</h2><div class="timeline">${SPRINTS.map(s => { const st = STORIES.filter(x => x[4]===s.id), t = ptsOf(s.id), d = donePts(s.id);
+    return `<div class="sprint"><div><div class="when">${s.when}</div><div class="nm">${s.name.split("·")[1]||s.name}</div><div class="crumb">${s.id}${t?` · ${d}/${t} pts`:""}</div>${t?`<div class="prog"><i style="width:${Math.round(d/t*100)}%"></i></div>`:""}</div>
+    <div><b>Goal:</b> ${esc(s.goal)}<ul>${(s.items||st.map(x => `<span class="key">${x[0]}</span> ${esc(x[2])} ${x[5]!=="Done"?pill(x[5]):""}`)).map(i => `<li>${i}</li>`).join("")}</ul></div></div>`; }).join("")}</div>`;
+};
+V.board = () => {
+  const cols = ["To Do","In Progress","In Review","Done"], items = STORIES.filter(s => s[4]==="S6" || s[4]==="S5");
+  return `<div class="crumb">VRN / Build / Board</div><h1>Sprint board · S5 + S6</h1>
+  <p class="lead">Sprint 5 closed on 31-Oct. Sprint 6 carries the director's security work. Click a card for details.</p>
+  <div class="board">${cols.map(c => { const it = items.filter(s => s[5]===c);
+    return `<div class="col"><h4>${c}<span>${it.length}</span></h4>${it.map(s => `<div class="ticket" data-story="${s[0]}" tabindex="0"><span class="epic">${s[1]}</span><div class="t">${esc(s[2])}</div><div class="m"><span class="key">${s[0]}</span><span class="pts">${s[3]} pts</span></div></div>`).join("") || `<div class="crumb">Nothing here</div>`}</div>`; }).join("")}</div>`;
+};
+V.tests = () => {
+  const area = [...new Set(TESTS.map(t => t[4]))];
+  return `<div class="crumb">VRN / Test / Test cases</div><h1>Test cases</h1>
+  <p class="lead">Automated suite <span class="mono">tests/test_flow.py</span>: ${TESTS.length} tests, all passing on the last run (31-Oct-2026). Manual UAT below.</p>
+  <div class="grid g4" style="margin-bottom:14px">${area.map(a => `<div class="card stat"><b>${TESTS.filter(t=>t[4]===a).length}</b><span>${a}</span></div>`).join("")}</div>
+  <div class="bar"><input id="tq" type="search" placeholder="Search tests" aria-label="Search tests"><select id="ta" aria-label="Type"><option value="">All types</option>${area.map(a=>`<option>${a}</option>`).join("")}</select></div>
+  <div class="tbl"><table><thead><tr><th>ID</th><th>Test case</th><th>Function</th><th>Req</th><th>Type</th><th>Result</th></tr></thead><tbody id="ttb"></tbody></table></div>
+  <h2>User acceptance tests</h2>
+  <div class="tbl"><table><thead><tr><th>ID</th><th>Scenario</th><th>Req</th><th>Result</th><th>Evidence</th></tr></thead><tbody>
+  ${UAT.map(u => `<tr><td class="key">${u[0]}</td><td>${esc(u[1])}</td><td class="mono">${u[2]}</td><td>${pill(u[3])}</td><td class="crumb">${esc(u[4])}</td></tr>`).join("")}</tbody></table></div>`;
+};
+function fillTests(){
+  const q = ($("#tq").value||"").toLowerCase(), a = $("#ta").value;
+  $("#ttb").innerHTML = TESTS.filter(t => (!q || (t.join(" ")).toLowerCase().includes(q)) && (!a || t[4]===a))
+    .map(t => `<tr><td class="key">${t[0]}</td><td>${esc(t[2])}</td><td class="mono">${t[1]}</td><td class="mono">${t[3]}</td><td>${t[4]}</td><td>${pill("Pass")}</td></tr>`).join("");
+}
+V.bugs = () => {
+  const c = s => BUGS.filter(b => b[2]===s).length;
+  return `<div class="crumb">VRN / Test / Bugs</div><h1>Bugs</h1>
+  <p class="lead">Every defect found from first build to today, with its root cause and fix. Click a row for the full ticket.</p>
+  <div class="grid g4" style="margin-bottom:14px">
+    <div class="card stat"><b>${BUGS.filter(b=>b[3]==="Open").length}</b><span>open</span></div>
+    <div class="card stat"><b>${BUGS.filter(b=>b[3]==="Done").length}</b><span>fixed</span></div>
+    <div class="card stat"><b>${c("Critical")}</b><span>critical (all fixed)</span></div>
+    <div class="card stat"><b>${c("Major")}</b><span>major</span></div></div>
+  <div class="bar"><input id="gq" type="search" placeholder="Search bugs" aria-label="Search bugs">
+   <select id="gs" aria-label="Severity"><option value="">All severities</option><option>Critical</option><option>Major</option><option>Minor</option><option>Trivial</option></select>
+   <select id="gt" aria-label="Status"><option value="">All statuses</option><option>Open</option><option>Done</option><option>Won't fix</option></select></div>
+  <div class="tbl"><table><thead><tr><th>Key</th><th>Summary</th><th>Severity</th><th>Status</th><th>Sprint</th><th>Found by</th></tr></thead><tbody id="gtb"></tbody></table></div>`;
+};
+function fillBugs(){
+  const q = ($("#gq").value||"").toLowerCase(), s = $("#gs").value, t = $("#gt").value;
+  $("#gtb").innerHTML = BUGS.filter(b => (!q || b.join(" ").toLowerCase().includes(q)) && (!s || b[2]===s) && (!t || b[3]===t))
+    .map(b => `<tr class="click" data-bug="${b[0]}"><td class="key">${b[0]}</td><td>${esc(b[1])}</td><td>${sev(b[2])}</td><td>${pill(b[3])}</td><td class="mono">${b[4]}</td><td class="crumb">${esc(b[5])}</td></tr>`).join("")
+    || `<tr><td colspan="6" class="crumb">No bug matches.</td></tr>`;
+}
+V.rtm = () => `<div class="crumb">VRN / Test / Traceability</div><h1>Requirements traceability matrix</h1>
+  <p class="lead">Each requirement mapped to the test cases that prove it. A requirement with no test is a gap.</p>
+  <div class="tbl"><table><thead><tr><th>Req</th><th>Requirement</th><th>Tests</th><th>Coverage</th></tr></thead><tbody>
+  ${FR.concat(NFR.map(n => [n[0], n[1]+": "+n[2], ""])).map(r => { const t = testsFor(r[0]).map(x=>x[0]).concat(UAT.filter(u=>u[2]===r[0]).map(u=>u[0]));
+    return `<tr><td class="key">${r[0]}</td><td>${esc(r[1])}</td><td class="mono" style="max-width:340px">${t.join(", ")||"–"}</td><td>${t.length?pill("Done").replace("Done","Covered"):pill("Open").replace("Open","Gap")}</td></tr>`; }).join("")}</tbody></table></div>`;
+V.releases = () => `<div class="crumb">VRN / Ship / Releases</div><h1>Releases</h1>
+  <p class="lead">Deploy procedure for every release: test locally (pytest) → copy to staging → back up the PC's files into logs/backup_* → copy → md5 check every file → restart with RESTART_VERONICA.bat → health check.</p>
+  <div class="tbl"><table><thead><tr><th>Version</th><th>Date</th><th>Name</th><th>What shipped</th></tr></thead><tbody>
+  ${RELEASES.slice().reverse().map(r => `<tr><td class="key">${r[0]}</td><td class="mono">${r[1]}</td><td style="font-weight:600">${r[2]}</td><td>${esc(r[3])}</td></tr>`).join("")}</tbody></table></div>
+  <h2>Definition of Done</h2>
+  <ul><li>Acceptance criteria met and shown to the product owner</li><li>Automated tests added and the full suite green</li><li>No secret in code, logs or chat</li><li>Deployed with a backup and md5 check</li><li>Works in light and dark, on laptop and phone</li></ul>`;
+V.retro = () => `<div class="crumb">VRN / Ship / Retrospective</div><h1>Retrospective</h1>
+  <p class="lead">Looking back over sprints 1–5.</p>
+  <div class="grid g2">
+   <div class="card"><h3 style="margin-top:0;color:var(--good)">What went well</h3><ul style="margin:0;padding-left:18px">
+    <li>Director impressed at the demo</li><li>Dashboards reuse the existing HTML templates, so numbers match what management knows</li><li>Test suite grew past 50 and caught real bugs before release (BUG-13)</li><li>Every deploy backed up and verified</li></ul></div>
+   <div class="card"><h3 style="margin-top:0;color:var(--bad)">What hurt</h3><ul style="margin:0;padding-left:18px">
+    <li>An unsynced view caused an error in front of management (BUG-8)</li><li>Free quick tunnel changed URL on every restart, breaking WhatsApp</li><li>Restarts need an admin click, which slowed every release</li><li>Report files were reachable without login until v1.3</li></ul></div>
+   <div class="card"><h3 style="margin-top:0;color:var(--acc)">Actions</h3><ul style="margin:0;padding-left:18px">
+    <li>Check data readiness before showing a dashboard (done)</li><li>Move to a fixed LAN address + VPN (S6)</li><li>Add 2-factor sign-in (S6)</li><li>Rotate exposed tokens; keep secrets only in .env (S6)</li></ul></div>
+   <div class="card"><h3 style="margin-top:0">Lessons</h3><ul style="margin:0;padding-left:18px">
+    <li>Security is a feature: plan it in Sprint 1 next time</li><li>Load data before the demo, not during it</li><li>Measure speed in the log: it found the voice problem in minutes</li></ul></div>
+  </div>`;
+
+/* ---------------- drawer ---------------- */
+function openStory(k){
+  const s = STORIES.find(x => x[0]===k);
+  $("#pane").innerHTML = `<div class="crumb">${EPICS[s[1]]} / ${s[0]}</div><h1 style="font-size:21px">${esc(s[2])}</h1>${pill(s[5])}
+  <dl><dt>Epic</dt><dd><span class="epic">${s[1]}</span> ${EPICS[s[1]]}</dd><dt>Story points</dt><dd>${s[3]}</dd><dt>Sprint</dt><dd>${sprintName(s[4])}</dd><dt>Assignee</dt><dd>Shubham Kakde (with Claude)</dd><dt>Acceptance</dt><dd>${esc(s[6])}</dd></dl>
+  <button class="tbtn" type="button" data-close>Close</button>`;
+  $("#drawer").hidden = false; $("#pane").querySelector("[data-close]").focus();
+}
+function openBug(k){
+  const b = BUGS.find(x => x[0]===k);
+  $("#pane").innerHTML = `<div class="crumb">Bug / ${b[0]}</div><h1 style="font-size:21px">${esc(b[1])}</h1><div style="display:flex;gap:10px;align-items:center">${sev(b[2])}${pill(b[3])}</div>
+  <dl><dt>Sprint</dt><dd>${sprintName(b[4])}</dd><dt>Found by</dt><dd>${esc(b[5])}</dd><dt>Root cause</dt><dd>${esc(b[6])}</dd><dt>Fix</dt><dd>${esc(b[7])}</dd></dl>
+  <h3>Workflow</h3><div class="hist"><div><b>Open</b>Reported (${esc(b[5])})</div><div><b>Analysis</b>${esc(b[6])}</div>${b[3]!=="Open"?`<div><b>${b[3]==="Done"?"Fixed":"Closed"}</b>${esc(b[7])}</div>`:`<div><b>Next</b>${esc(b[7])}</div>`}</div>
+  <p><button class="tbtn" type="button" data-close>Close</button></p>`;
+  $("#drawer").hidden = false; $("#pane").querySelector("[data-close]").focus();
+}
+$("#drawer").addEventListener("click", e => { if (e.target.id==="drawer" || e.target.closest("[data-close]")) $("#drawer").hidden = true; });
+document.addEventListener("keydown", e => { if (e.key==="Escape") $("#drawer").hidden = true;
+  if (e.key==="Enter" && e.target.dataset && e.target.dataset.story) openStory(e.target.dataset.story); });
+$("#main").addEventListener("click", e => { const s = e.target.closest("[data-story]"), b = e.target.closest("[data-bug]");
+  if (s) openStory(s.dataset.story); else if (b) openBug(b.dataset.bug); });
+$("#main").addEventListener("input", e => { if (/^(bq|be|bs)$/.test(e.target.id)) fillBacklog(); if (/^(tq|ta)$/.test(e.target.id)) fillTests(); if (/^(gq|gs|gt)$/.test(e.target.id)) fillBugs(); });
+
+/* ---------------- routing ---------------- */
+function show(){
+  const v = (location.hash||"").slice(1);
+  const view = V[v] ? v : "overview";
+  $("#main").innerHTML = V[view](); $("#main").scrollTop = 0;
+  document.querySelectorAll("#nav [data-v]").forEach(b => b.classList.toggle("on", b.dataset.v===view));
+  if (view==="backlog") fillBacklog(); if (view==="tests") fillTests(); if (view==="bugs") fillBugs();
+}
+$("#nav").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (b) { location.hash = b.dataset.v; } });
+window.addEventListener("hashchange", show);
+$("#nStories").textContent = STORIES.length; $("#nTests").textContent = TESTS.length; $("#nBugs").textContent = BUGS.length;
+
+/* theme toggle (remembered per viewer) */
+const root = document.documentElement;
+function curDark(){ const t = root.dataset.theme; return t ? t==="dark" : matchMedia("(prefers-color-scheme: dark)").matches; }
+function syncThemeBtn(){ $("#theme").textContent = curDark() ? "Light" : "Dark"; }
+try { const t = localStorage.getItem("vrn_theme"); if (t) root.dataset.theme = t; } catch(e){}
+$("#theme").addEventListener("click", () => { root.dataset.theme = curDark() ? "light" : "dark"; try { localStorage.setItem("vrn_theme", root.dataset.theme); } catch(e){} syncThemeBtn(); });
+try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", syncThemeBtn); } catch(e){}
+syncThemeBtn(); show();
+</script>
+</body>
+</html>

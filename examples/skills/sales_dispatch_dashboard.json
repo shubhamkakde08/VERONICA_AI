@@ -1,0 +1,11 @@
+{
+ "name": "sales_dispatch_dashboard",
+ "title": "Monthwise Sales Dispatch (sale invoices: MT, value, realisation by month, customer, grade, product)",
+ "description": "Monthwise sales dispatch / sale invoice MIS from VIEW_SALE_INVOICE_PBI - exact logic of 'Monthwise_Sales_Dispatch_v1.html' (Venus Sale MIS). Use for: '/sales_dispatch_dashboard', 'sales dispatch', 'dispatch report', 'sale invoice report', 'monthwise sales', 'monthwise dispatch', 'realisation', 'sales MIS'. Admin and manager roles only.",
+ "rules": "SOURCE\n1. Data: VIEW_SALE_INVOICE_PBI (one row per sale invoice line).\n2. ALWAYS use run_report_engine(skill_name='sales_dispatch_dashboard', from_date, to_date). Never write SQL for this report.\n3. Period = sale bill date. Default = this financial year to date (April 1 to today) because it is a month-wise report. 'last month' / 'yesterday' / a date range work as asked.\n4. Dispatch in MT (Kg / 1000), value in Rs Cr (material value), realisation = value / qty in Rs per kg.\nOUTPUT\nKPI cards, monthwise table + chart, top customers and the Sales Dispatch dashboard (tabs, slicers, Excel export).",
+ "output_format": "Call run_report_engine ONCE. It delivers KPI cards (dispatch MT, sale value Rs Cr, realisation Rs/kg, invoice lines), the monthwise table, top customers and the live dashboard by itself. Reply with a 2-3 line summary: total, best month, biggest change.",
+ "default_formats": ["table", "chart"],
+ "sql_template": "{\n \"engine\": \"sale_dispatch\",\n \"source\": \"VIEW_SALE_INVOICE_PBI\",\n \"formats\": [\n  \"table\",\n  \"chart\",\n  \"html\",\n  \"excel\",\n  \"dashboard\"\n ],\n \"template\": \"app/templates/dashboards/sales_dispatch_v1.html\"\n}",
+ "example_output": "KPI cards: Dispatch 18,420 MT | Sale value 812.4 Rs Cr | Realisation 441 Rs/kg | 9,812 invoice lines. Monthwise table Apr..Oct, top 20 customers, and the dashboard.",
+ "allowed_roles": ["admin", "manager"]
+}

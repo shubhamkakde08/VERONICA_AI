@@ -1,0 +1,2009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Final Production Rejection v13</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+  <script>
+    (function(){var t=null;try{t=localStorage.getItem('vp-theme');}catch(e){}
+      if(t!=='light'&&t!=='dark'){t=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}
+      document.documentElement.setAttribute('data-theme',t);})();
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+  <style>
+    /* ================= THEME TOKENS ================= */
+    :root, :root[data-theme="light"] {
+      --bg: #eef2f8;
+      --bg-a: rgba(56,189,248,.18);
+      --bg-b: rgba(99,102,241,.14);
+      --bg-c: rgba(16,185,129,.10);
+      --surface: rgba(255,255,255,.78);
+      --surface-solid: #ffffff;
+      --surface-2: #f8fafc;
+      --border: rgba(15,23,42,.08);
+      --border-strong: #cbd5e1;
+      --text: #0f172a;
+      --text-2: #334155;
+      --muted: #64748b;
+      --accent: #0ea5e9;
+      --accent-2: #6366f1;
+      --accent-soft: rgba(14,165,233,.12);
+      --accent-ring: rgba(14,165,233,.28);
+      --field: #ffffff;
+      --grid: #e5eaf1;
+      --shadow: 0 1px 2px rgba(15,23,42,.04), 0 8px 24px -8px rgba(15,23,42,.10);
+      --shadow-lg: 0 2px 4px rgba(15,23,42,.04), 0 24px 48px -16px rgba(15,23,42,.18);
+      --hdr-1: #061a2b; --hdr-2: #0b3d5c; --hdr-3: #0f5a85;
+      --th-1: #0b3d5c; --th-2: #164e6f; --th-3: #0a334d; --th-gt: #062536;
+      --hover: brightness(0.965);
+      /* rows */
+      --r-prod: #d1fae5;  --r-prod-t: #064e3b;
+      --r-rejh: #fecaca;  --r-rejh-t: #7f1d1d;
+      --r-rej: #fee2e2;   --r-rej-t: #991b1b;
+      --r-rew: #ffedd5;   --r-rew-t: #9a3412;
+      --r-abc: #fce7f3;   --r-abc-t: #9d174d;
+      --r-sub: #fef3c7;   --r-sub-t: #854d0e;
+      --r-tot: #bfdbfe;   --r-tot-t: #1e3a8a;
+      --r-a: #e0e7ff;     --r-a-t: #3730a3;
+      --r-b: #ede9fe;     --r-b-t: #5b21b6;
+      --r-c: #fae8ff;     --r-c-t: #86198f;
+      --r-pct: #f5f3ff;   --r-pct-t: #5b21b6;
+      --c-prod: #ecfdf5;  --c-prod-t: #065f46;
+      --c-rej: #fef2f2;   --c-rej-t: #9f1239;
+      --c-rew: #fff7ed;   --c-rew-t: #9a3412;
+      --c-abc: #fdf2f8;   --c-abc-t: #9d174d;
+      color-scheme: light;
+    }
+    :root[data-theme="dark"] {
+      --bg: #060b16;
+      --bg-a: rgba(14,165,233,.16);
+      --bg-b: rgba(99,102,241,.16);
+      --bg-c: rgba(16,185,129,.08);
+      --surface: rgba(15,23,42,.66);
+      --surface-solid: #0e1627;
+      --surface-2: rgba(30,41,59,.45);
+      --border: rgba(148,163,184,.13);
+      --border-strong: #273449;
+      --text: #e6edf7;
+      --text-2: #cbd5e1;
+      --muted: #8a9ab3;
+      --accent: #38bdf8;
+      --accent-2: #818cf8;
+      --accent-soft: rgba(56,189,248,.14);
+      --accent-ring: rgba(56,189,248,.32);
+      --field: #0a1222;
+      --grid: #1b2638;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -10px rgba(0,0,0,.6);
+      --shadow-lg: 0 2px 6px rgba(0,0,0,.35), 0 28px 60px -18px rgba(0,0,0,.75);
+      --hdr-1: #030712; --hdr-2: #071a2e; --hdr-3: #0b3352;
+      --th-1: #0c2a40; --th-2: #12384f; --th-3: #0a2335; --th-gt: #051a28;
+      --hover: brightness(1.18);
+      --r-prod: #0d2a24;  --r-prod-t: #6ee7b7;
+      --r-rejh: #3a1219;  --r-rejh-t: #fca5a5;
+      --r-rej: #26131a;   --r-rej-t: #fda4af;
+      --r-rew: #281a10;   --r-rew-t: #fdba74;
+      --r-abc: #271325;   --r-abc-t: #f9a8d4;
+      --r-sub: #282210;   --r-sub-t: #fcd34d;
+      --r-tot: #0f2142;   --r-tot-t: #93c5fd;
+      --r-a: #161c3b;     --r-a-t: #a5b4fc;
+      --r-b: #1c1738;     --r-b-t: #c4b5fd;
+      --r-c: #23132d;     --r-c-t: #f0abfc;
+      --r-pct: #16142b;   --r-pct-t: #c4b5fd;
+      --c-prod: #0a1f1b;  --c-prod-t: #a7f3d0;
+      --c-rej: #1c0f14;   --c-rej-t: #fecdd3;
+      --c-rew: #1e140c;   --c-rew-t: #fed7aa;
+      --c-abc: #1d0f1c;   --c-abc-t: #fbcfe8;
+      color-scheme: dark;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { transition: background-color .3s ease; }
+    body {
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(1100px 600px at 8% -10%, var(--bg-a), transparent 60%),
+        radial-gradient(900px 600px at 100% 0%, var(--bg-b), transparent 60%),
+        radial-gradient(900px 700px at 50% 110%, var(--bg-c), transparent 60%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      color: var(--text);
+      margin: 0;
+      -webkit-font-smoothing: antialiased;
+      transition: color .3s ease, background-color .3s ease;
+    }
+
+    /* ================= HEADER ================= */
+    .app-header {
+      background:
+        radial-gradient(600px 160px at 15% 0%, rgba(56,189,248,.28), transparent 70%),
+        radial-gradient(500px 160px at 90% 100%, rgba(129,140,248,.25), transparent 70%),
+        linear-gradient(120deg, var(--hdr-1) 0%, var(--hdr-2) 55%, var(--hdr-3) 100%);
+      color: #fff;
+      box-shadow: 0 10px 30px -12px rgba(2,12,27,.6);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .app-header::after {
+      content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(56,189,248,.8), rgba(129,140,248,.8), transparent);
+    }
+    .app-header .brand-mark {
+      width: 46px; height: 46px; border-radius: 13px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 1.05rem; letter-spacing: -.02em;
+      background: linear-gradient(145deg, #38bdf8, #6366f1);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.55), inset 0 -6px 12px rgba(0,0,0,.18), 0 8px 20px -6px rgba(56,189,248,.65);
+      position: relative; overflow: hidden;
+    }
+    .app-header .brand-mark::before {
+      content: ''; position: absolute; inset: 0 0 50% 0;
+      background: linear-gradient(180deg, rgba(255,255,255,.45), rgba(255,255,255,0));
+    }
+    .app-header h1 {
+      font-size: 1.3rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.2; margin: 0;
+      background: linear-gradient(90deg, #ffffff, #c7e7ff);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .app-header .subtitle { font-size: .76rem; color: rgba(191,219,254,.85); margin-top: 3px; font-weight: 500; letter-spacing: .01em; }
+    .header-right { display: flex; align-items: center; gap: .9rem; }
+    .header-meta { text-align: right; font-size: .8rem; }
+    .header-meta #period-label {
+      font-weight: 600; color: #fff;
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14);
+      padding: .3rem .7rem; border-radius: 999px; display: inline-block;
+      font-variant-numeric: tabular-nums;
+    }
+    .header-meta #print-date { color: rgba(191,219,254,.7); font-size: .68rem; margin-top: 4px; }
+    .theme-toggle {
+      width: 40px; height: 40px; border-radius: 12px; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: #fff; background: rgba(255,255,255,.08) !important;
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.15);
+      transition: background .2s ease, transform .2s ease;
+    }
+    .theme-toggle:hover { background: rgba(255,255,255,.16) !important; transform: rotate(-12deg); }
+    .theme-toggle svg { width: 18px; height: 18px; }
+    .theme-toggle .ic-sun { display: none; }
+    :root[data-theme="dark"] .theme-toggle .ic-sun { display: block; }
+    :root[data-theme="dark"] .theme-toggle .ic-moon { display: none; }
+
+    /* ================= CARDS ================= */
+    .card {
+      background: var(--surface);
+      -webkit-backdrop-filter: blur(14px) saturate(140%);
+      backdrop-filter: blur(14px) saturate(140%);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      transition: box-shadow .25s ease, background-color .3s ease, border-color .3s ease;
+    }
+    .card:hover { box-shadow: var(--shadow-lg); }
+
+    /* ================= UPLOAD ================= */
+    #upload-zone {
+      border: 2px dashed var(--border-strong);
+      border-radius: 18px; padding: 3.5rem 1.5rem; text-align: center; cursor: pointer;
+      transition: all .25s ease;
+      background:
+        radial-gradient(500px 200px at 50% 0%, var(--accent-soft), transparent 70%),
+        var(--surface-2);
+    }
+    #upload-zone:hover, #upload-zone.dragover {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 6px var(--accent-soft), inset 0 0 40px var(--accent-soft);
+      transform: translateY(-2px);
+    }
+    #upload-zone .upload-icon {
+      width: 72px; height: 72px; margin: 0 auto 1.1rem; border-radius: 20px;
+      display: flex; align-items: center; justify-content: center; font-size: 1.9rem;
+      background: linear-gradient(145deg, #38bdf8, #6366f1);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 14px 30px -10px rgba(99,102,241,.6);
+      position: relative; overflow: hidden;
+    }
+    #upload-zone .upload-icon::before {
+      content: ''; position: absolute; inset: 0 0 52% 0;
+      background: linear-gradient(180deg, rgba(255,255,255,.5), rgba(255,255,255,0));
+    }
+    #upload-zone .upload-title { font-size: 1.2rem; font-weight: 750; color: var(--text); margin: 0 0 .35rem; letter-spacing: -.01em; }
+    #upload-zone .upload-hint { font-size: .86rem; color: var(--muted); margin: 0; }
+    #upload-zone .format-badges { display: flex; gap: .5rem; justify-content: center; margin-top: 1.1rem; }
+    #upload-zone .format-badges span {
+      font-size: .7rem; font-weight: 700; padding: .28rem .7rem; border-radius: 999px;
+      background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent-ring);
+      font-family: 'JetBrains Mono', Consolas, monospace;
+    }
+
+    /* ================= SLICERS ================= */
+    .slicer-section { padding: 1.2rem 1.4rem 1.3rem; }
+    .slicer-header {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+      gap: .75rem; margin-bottom: 1rem; padding-bottom: .9rem; border-bottom: 1px solid var(--border);
+    }
+    .slicer-title { font-size: .92rem; font-weight: 750; color: var(--text); display: flex; align-items: center; gap: .55rem; letter-spacing: -.01em; }
+    .slicer-title .bar { width: 4px; height: 18px; border-radius: 3px; background: linear-gradient(180deg, var(--accent), var(--accent-2)); box-shadow: 0 0 10px var(--accent-ring); }
+    .slicer-title .badge {
+      font-size: .62rem; font-weight: 700; color: var(--accent);
+      background: var(--accent-soft); border: 1px solid var(--accent-ring);
+      padding: .18rem .6rem; border-radius: 999px; letter-spacing: .03em; text-transform: uppercase;
+    }
+    .slicer-actions { display: flex; gap: .5rem; }
+    .btn-reset, .btn-apply {
+      padding: .5rem 1.05rem; font-size: .76rem; font-weight: 700; border-radius: 10px; cursor: pointer;
+      transition: all .18s ease; border: none; display: inline-flex; align-items: center; gap: .35rem;
+    }
+    .btn-reset { background: var(--surface-solid) !important; color: var(--text-2); border: 1px solid var(--border-strong); }
+    .btn-reset:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-apply {
+      color: #fff; background-image: linear-gradient(135deg, #0ea5e9, #6366f1) !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 6px 16px -6px rgba(99,102,241,.6);
+    }
+    .btn-apply:hover { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 10px 22px -8px rgba(99,102,241,.75); }
+    .filter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: .9rem 1rem; }
+    .filter-item {
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px;
+      padding: .7rem .75rem .6rem; transition: border-color .18s, box-shadow .18s, background-color .3s;
+    }
+    .filter-item:hover { border-color: var(--border-strong); }
+    .filter-item.has-selection { border-color: var(--accent-ring); background: var(--accent-soft); box-shadow: 0 0 0 3px var(--accent-soft); }
+    .filter-item .label-row { display: flex; align-items: center; justify-content: space-between; gap: .4rem; margin-bottom: .4rem; }
+    .filter-item label { display: block; font-size: .72rem; font-weight: 750; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin: 0; }
+    .filter-item .sel-badge { font-size: .6rem; font-weight: 700; padding: .12rem .5rem; border-radius: 999px; white-space: nowrap; }
+    .sel-badge.all { background: var(--surface-solid); color: var(--muted); border: 1px solid var(--border); }
+    .sel-badge.filtered { background: linear-gradient(135deg, #0ea5e9, #6366f1); color: #fff; box-shadow: 0 2px 8px -2px rgba(99,102,241,.6); }
+    .filter-item input[type="date"] {
+      width: 100%; border: 1px solid var(--border-strong); border-radius: 9px; padding: .5rem .65rem;
+      font-size: .82rem; background: var(--field); color: var(--text); outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .filter-item input[type="date"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-ring); }
+    .slicer-hint { font-size: .62rem; color: var(--muted); margin-top: .35rem; font-weight: 500; line-height: 1.35; min-height: 1.1em; }
+    .slicer-hint strong { color: var(--accent); font-weight: 700; }
+    .slicer-hint .hint-vals { color: var(--accent); font-weight: 600; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+    #context-bar {
+      margin-top: 1rem; padding: .8rem 1rem; border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent-soft), transparent 70%), var(--surface-2);
+      border: 1px solid var(--border); font-size: .75rem; color: var(--text-2); line-height: 1.55;
+    }
+    #context-bar strong { color: var(--accent); font-weight: 750; font-variant-numeric: tabular-nums; }
+    #context-bar .ctx-title { font-size: .64rem; font-weight: 750; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: .45rem; }
+    #context-bar .ctx-stats { display: flex; flex-wrap: wrap; gap: .45rem 1rem; margin-bottom: .5rem; }
+    #context-bar .ctx-chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+    #context-bar .ctx-chip {
+      display: inline-flex; align-items: center; gap: .3rem; background: var(--surface-solid);
+      border: 1px solid var(--border-strong); border-radius: 8px; padding: .22rem .55rem;
+      font-size: .68rem; font-weight: 600; color: var(--text-2);
+    }
+    #context-bar .ctx-chip .chip-n {
+      background: linear-gradient(135deg, #0ea5e9, #6366f1); color: #fff; font-size: .6rem; font-weight: 700;
+      padding: .08rem .38rem; border-radius: 999px; min-width: 1.1rem; text-align: center;
+    }
+    #context-bar .ctx-chip.none { background: transparent; border-style: dashed; color: var(--muted); font-weight: 500; }
+
+    /* ================= TOM SELECT ================= */
+    .ts-wrapper { background: transparent !important; }
+    .ts-control {
+      border-radius: 9px !important; border: 1px solid var(--border-strong) !important; min-height: 38px !important;
+      background: var(--field) !important; box-shadow: none !important; color: var(--text) !important;
+      transition: border-color .15s, box-shadow .15s !important;
+    }
+    .ts-wrapper.focus .ts-control { border-color: var(--accent) !important; box-shadow: 0 0 0 3px var(--accent-ring) !important; }
+    .ts-control input { color: var(--text) !important; font-size: .82rem !important; }
+    .ts-control input::placeholder { color: var(--muted) !important; }
+    .ts-dropdown {
+      background: var(--surface-solid) !important; color: var(--text) !important;
+      border: 1px solid var(--border-strong) !important; box-shadow: var(--shadow-lg) !important;
+      z-index: 200 !important; border-radius: 10px !important; margin-top: 6px !important; overflow: hidden;
+    }
+    .ts-dropdown .option { background: transparent !important; color: var(--text) !important; font-size: .82rem !important; padding: .42rem .7rem !important; }
+    .ts-dropdown .option.active, .ts-dropdown .option:hover { background: var(--accent-soft) !important; color: var(--accent) !important; }
+    .ts-dropdown .ts-dropdown-content { scrollbar-width: thin; }
+    .ts-dropdown input[type="checkbox"] { accent-color: var(--accent); }
+    .ts-control .item {
+      background: var(--accent-soft) !important; color: var(--accent) !important;
+      border: 1px solid var(--accent-ring) !important; border-radius: 6px !important;
+      font-size: .74rem !important; font-weight: 650 !important; padding: 1px 6px !important;
+    }
+    .ts-wrapper.plugin-remove_button .item .remove { border-left-color: var(--accent-ring) !important; color: inherit !important; }
+
+    /* ================= DIVISION TABS (segmented) ================= */
+    .div-tabs {
+      display: inline-flex; gap: .3rem; padding: .35rem; border-radius: 14px;
+      background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow);
+      -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    }
+    .div-tab {
+      cursor: pointer; padding: .6rem 1.35rem; border-radius: 10px; font-weight: 700; font-size: .84rem;
+      transition: all .2s ease; user-select: none; color: var(--muted); position: relative;
+    }
+    .div-tab.active {
+      color: #fff;
+      background: linear-gradient(135deg, #0ea5e9, #6366f1);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 8px 18px -8px rgba(99,102,241,.7);
+    }
+    .div-tab:not(.active):hover { color: var(--text); background: var(--surface-2); }
+
+    /* ================= GLOSSY KPIs ================= */
+    .kpi-box {
+      --k1: #10b981; --k2: #047857; --kglow: rgba(16,185,129,.55);
+      position: relative; overflow: hidden; isolation: isolate;
+      border-radius: 16px; padding: 1.05rem 1rem 1.1rem; text-align: left; color: #fff;
+      background:
+        radial-gradient(120% 90% at 100% 0%, rgba(255,255,255,.22), transparent 55%),
+        linear-gradient(150deg, var(--k1) 0%, var(--k2) 100%);
+      border: 1px solid rgba(255,255,255,.22);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.55),
+        inset 0 -14px 24px -10px rgba(0,0,0,.28),
+        0 14px 28px -14px var(--kglow),
+        0 2px 4px rgba(0,0,0,.06);
+      transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s ease;
+    }
+    .kpi-box::before { /* gloss cap */
+      content: ''; position: absolute; z-index: -1; left: -10%; right: -10%; top: -55%; height: 105%;
+      border-radius: 0 0 50% 50% / 0 0 30% 30%;
+      background: linear-gradient(180deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,.10) 70%, rgba(255,255,255,0) 100%);
+      pointer-events: none;
+    }
+    .kpi-box::after { /* shine sweep */
+      content: ''; position: absolute; z-index: 1; top: 0; bottom: 0; width: 45%; left: -70%;
+      background: linear-gradient(100deg, transparent, rgba(255,255,255,.38), transparent);
+      transform: skewX(-18deg); pointer-events: none; transition: left .7s ease;
+    }
+    .kpi-box:hover {
+      transform: translateY(-4px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.6), inset 0 -14px 24px -10px rgba(0,0,0,.28), 0 22px 40px -14px var(--kglow), 0 2px 4px rgba(0,0,0,.06);
+    }
+    .kpi-box:hover::after { left: 130%; }
+    .kpi-box .lbl {
+      position: relative; z-index: 2;
+      font-size: .82rem; letter-spacing: .01em; font-weight: 700; line-height: 1.3;
+      color: rgba(255,255,255,.95); display: flex; align-items: center; gap: .45rem;
+    }
+    .kpi-box .lbl::before {
+      content: ''; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+      background: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,.25), 0 0 10px rgba(255,255,255,.8);
+    }
+    .kpi-box .val {
+      position: relative; z-index: 2;
+      font-size: 1.75rem; font-weight: 800; letter-spacing: -.03em; margin-top: .45rem; line-height: 1.15;
+      font-variant-numeric: tabular-nums; color: #fff;
+      text-shadow: 0 1px 0 rgba(0,0,0,.12), 0 2px 12px rgba(0,0,0,.18);
+    }
+    body[data-measure="NOS"] .kpi-box .val::after { content: ' Nos'; }
+    body[data-measure="MTR"] .kpi-box .val::after { content: ' Mtr'; }
+    .kpi-box .val::after { content: ' MT'; font-size: .62rem; font-weight: 700; letter-spacing: .05em; opacity: .75; }
+    .k-prod { --k1: #34d399; --k2: #047857; --kglow: rgba(16,185,129,.6); }
+    .k-rej  { --k1: #fb7185; --k2: #be123c; --kglow: rgba(244,63,94,.6); }
+    .k-rew  { --k1: #fb923c; --k2: #c2410c; --kglow: rgba(249,115,22,.6); }
+    .k-abc  { --k1: #e879f9; --k2: #a21caf; --kglow: rgba(217,70,239,.6); }
+    .k-sub  { --k1: #fbbf24; --k2: #b45309; --kglow: rgba(245,158,11,.6); }
+    .k-tot  { --k1: #60a5fa; --k2: #4338ca; --kglow: rgba(79,70,229,.65); }
+    :root[data-theme="dark"] .kpi-box { border-color: rgba(255,255,255,.16); }
+
+    /* ================= REPORT TABLE ================= */
+    .rpt-wrap { overflow: auto; max-height: 70vh; border-radius: 0 0 18px 18px; scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+    .rpt-wrap::-webkit-scrollbar { width: 10px; height: 10px; }
+    .rpt-wrap::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 10px; border: 2px solid transparent; background-clip: padding-box; }
+    .rpt-table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: .84rem; }
+    .rpt-table th, .rpt-table td {
+      border-bottom: 1px solid var(--grid); border-right: 1px solid var(--grid);
+      padding: .6rem .8rem; white-space: nowrap;
+    }
+    .rpt-table th:last-child, .rpt-table td:last-child { border-right: none; }
+    .rpt-table thead th {
+      color: #fff; position: sticky; top: 0; z-index: 20; font-weight: 650;
+      border-color: rgba(255,255,255,.08);
+    }
+    .rpt-table thead tr:first-child th { height: 42px; }
+    .rpt-table thead tr:nth-child(2) th { top: 42px; }
+    .rpt-table .sticky-col {
+      position: sticky; left: 0; z-index: 15; background: inherit; min-width: 210px;
+      box-shadow: 6px 0 12px -8px rgba(0,0,0,.25);
+    }
+    .rpt-table thead .sticky-col { z-index: 25; background: var(--th-1) !important; }
+    .rpt-table thead tr:first-child th:last-child { background: var(--th-gt) !important; }
+    .rpt-table tbody tr td { transition: filter .15s ease; }
+    .rpt-table tbody tr:hover td { filter: var(--hover); }
+    .num { text-align: right; font-variant-numeric: tabular-nums; font-family: 'JetBrains Mono', Consolas, monospace; font-size: .8rem; }
+    .plant-span { background: linear-gradient(180deg, var(--th-1), var(--th-3)); text-align: center; font-size: .8rem; letter-spacing: .06em; font-weight: 750 !important; }
+    .ig-sub { background: var(--th-2); font-weight: 600; font-size: .76rem; color: rgba(255,255,255,.9) !important; }
+    .plant-tot-hdr { background: var(--th-3); font-weight: 750; }
+
+    .r-prod, .r-prod td     { background: var(--r-prod); color: var(--r-prod-t); font-weight: 700; }
+    .r-rejp-h, .r-rejp-h td { background: var(--r-rejh); color: var(--r-rejh-t); font-weight: 750; letter-spacing: .02em; }
+    .r-rej, .r-rej td       { background: var(--r-rej);  color: var(--r-rej-t); }
+    .r-rew, .r-rew td       { background: var(--r-rew);  color: var(--r-rew-t); }
+    .r-abc, .r-abc td       { background: var(--r-abc);  color: var(--r-abc-t); font-weight: 600; }
+    .r-sub, .r-sub td       { background: var(--r-sub);  color: var(--r-sub-t); font-weight: 700; }
+    .r-tot, .r-tot td       { background: var(--r-tot);  color: var(--r-tot-t); font-weight: 800; }
+    .r-tot td { border-top: 2px solid currentColor; border-bottom: 2px solid currentColor; }
+    .r-a, .r-a td           { background: var(--r-a);    color: var(--r-a-t); }
+    .r-b, .r-b td           { background: var(--r-b);    color: var(--r-b-t); }
+    .r-c, .r-c td           { background: var(--r-c);    color: var(--r-c-t); }
+    .r-pct, .r-pct td       { background: var(--r-pct);  color: var(--r-pct-t); font-weight: 600; }
+
+    /* Expand / collapse for Tnature → Godown Code */
+    .expand-toggle { display: inline-flex; align-items: center; gap: .45rem; cursor: pointer; user-select: none; width: 100%; }
+    .expand-toggle:hover { opacity: .85; }
+    .expand-chevron {
+      display: inline-flex; align-items: center; justify-content: center; width: 19px; height: 19px; flex-shrink: 0;
+      border-radius: 6px; background: currentColor; font-size: .58rem; font-weight: 800;
+      transition: transform .2s ease;
+      color: inherit;
+    }
+    .expand-chevron { background: rgba(127,127,127,.18); }
+    tr.expanded .expand-chevron { transform: rotate(90deg); background: rgba(127,127,127,.3); }
+    .expand-hint { font-size: .58rem; font-weight: 650; opacity: .6; letter-spacing: .02em; margin-left: .15rem; }
+    tr.child-gd { display: none; }
+    tr.child-gd.open { display: table-row; animation: rowIn .22s ease; }
+    @keyframes rowIn { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: none; } }
+    tr.child-gd td { font-size: .78rem; font-weight: 500; }
+    tr.child-gd .sticky-col { padding-left: 1.85rem; font-weight: 600; font-family: 'JetBrains Mono', Consolas, monospace; font-size: .7rem; }
+    tr.child-gd .gd-name { font-family: 'Inter', 'Segoe UI', sans-serif; font-weight: 500; opacity: .7; font-size: .62rem; margin-left: .35rem; }
+    .r-prod-child, .r-prod-child td, .r-prod-child .sticky-col { background: var(--c-prod); color: var(--c-prod-t); }
+    .r-rej-child,  .r-rej-child td,  .r-rej-child .sticky-col  { background: var(--c-rej);  color: var(--c-rej-t); }
+    .r-rew-child,  .r-rew-child td,  .r-rew-child .sticky-col  { background: var(--c-rew);  color: var(--c-rew-t); }
+    .r-abc-child,  .r-abc-child td,  .r-abc-child .sticky-col  { background: var(--c-abc);  color: var(--c-abc-t); }
+    .r-prod .sticky-col, .r-rej .sticky-col, .r-rew .sticky-col, .r-abc .sticky-col { cursor: pointer; }
+
+    /* ================= EXPORT BUTTONS ================= */
+    .btn-export {
+      display: inline-flex; align-items: center; gap: .5rem; padding: .7rem 1.3rem; border-radius: 12px;
+      font-size: .82rem; font-weight: 700; border: 1px solid rgba(255,255,255,.2); cursor: pointer; color: #fff;
+      transition: all .2s ease; position: relative; overflow: hidden;
+    }
+    .btn-export::before {
+      content: ''; position: absolute; inset: 0 0 50% 0;
+      background: linear-gradient(180deg, rgba(255,255,255,.28), rgba(255,255,255,0)); pointer-events: none;
+    }
+    .btn-excel { background-image: linear-gradient(135deg, #22c55e, #15803d) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 10px 22px -10px rgba(22,163,74,.7); }
+    .btn-excel:hover { transform: translateY(-2px); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 16px 28px -10px rgba(22,163,74,.8); }
+    .btn-html { background-image: linear-gradient(135deg, #3b82f6, #4338ca) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 10px 22px -10px rgba(67,56,202,.7); }
+    .btn-html:hover { transform: translateY(-2px); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 16px 28px -10px rgba(67,56,202,.8); }
+
+    /* ================= UNIT HEADER ================= */
+    .unit-header {
+      background:
+        radial-gradient(400px 120px at 0% 0%, rgba(56,189,248,.35), transparent 70%),
+        linear-gradient(120deg, var(--th-gt), var(--th-1) 60%, var(--th-2));
+      padding: .95rem 1.3rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem;
+      border-radius: 18px 18px 0 0; border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .unit-header .unit-name { font-weight: 800; color: #fff; font-size: 1.15rem; letter-spacing: .01em; display: flex; align-items: center; gap: .55rem; }
+    .unit-header .unit-name::before {
+      content: ''; width: 9px; height: 9px; border-radius: 50%; background: #34d399;
+      box-shadow: 0 0 0 4px rgba(52,211,153,.2), 0 0 12px #34d399;
+    }
+    .unit-header .unit-meta {
+      font-size: .72rem; color: #e0f2fe; font-weight: 600;
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
+      padding: .22rem .65rem; border-radius: 999px;
+    }
+
+
+    /* ================= V11 ADDITIONS ================= */
+    .kpi-pct {
+      position: relative; z-index: 2; display: inline-block; margin-top: .45rem;
+      font-size: .72rem; font-weight: 700; color: #fff; letter-spacing: .01em;
+      background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.28);
+      padding: .14rem .55rem; border-radius: 999px; font-variant-numeric: tabular-nums;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.3);
+    }
+    body.hide-pct .pct-el { display: none !important; }
+
+    .tabs-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; }
+    .pct-toggle {
+      display: inline-flex; align-items: center; gap: .6rem; cursor: pointer; user-select: none;
+      padding: .55rem .95rem .55rem .7rem; border-radius: 12px; font-size: .84rem; font-weight: 700;
+      color: var(--text-2); background: var(--surface) !important; border: 1px solid var(--border);
+      box-shadow: var(--shadow); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+      transition: border-color .2s ease;
+    }
+    .pct-toggle:hover { border-color: var(--accent-ring); }
+    .pct-toggle .sw {
+      position: relative; width: 38px; height: 22px; border-radius: 999px; flex-shrink: 0;
+      background: linear-gradient(135deg, #0ea5e9, #6366f1);
+      box-shadow: inset 0 1px 2px rgba(0,0,0,.25); transition: background .2s ease;
+    }
+    .pct-toggle .sw::after {
+      content: ''; position: absolute; top: 3px; left: 19px; width: 16px; height: 16px; border-radius: 50%;
+      background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.35); transition: left .2s ease;
+    }
+    body.hide-pct .pct-toggle .sw { background: var(--border-strong); }
+    body.hide-pct .pct-toggle .sw::after { left: 3px; }
+    .pct-toggle .pct-sym {
+      display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 7px;
+      background: var(--accent-soft); color: var(--accent); font-weight: 800; font-size: .8rem;
+    }
+
+    .section-head {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem;
+      padding: 1rem 1.3rem; border-bottom: 1px solid var(--border);
+    }
+    .section-title { font-size: 1.05rem; font-weight: 800; color: var(--text); letter-spacing: -.01em; display: flex; align-items: center; gap: .55rem; }
+    .section-title::before { content: ''; width: 4px; height: 20px; border-radius: 3px; background: linear-gradient(180deg, var(--accent), var(--accent-2)); box-shadow: 0 0 10px var(--accent-ring); }
+    .section-sub { font-size: .8rem; font-weight: 600; color: var(--muted); }
+
+    .ig-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr)); gap: .9rem; padding: 1.1rem 1.3rem 1.2rem; }
+    .kpi-box.ig-kpi { padding: 1rem 1rem 1rem; }
+    .ig-kpi .lbl { font-size: .86rem; }
+    .ig-kpi .val { font-size: 1.5rem; }
+    .ig-kpi .ig-cap { position: relative; z-index: 2; font-size: .7rem; font-weight: 600; color: rgba(255,255,255,.8); margin-top: .1rem; }
+    .ig-break { position: relative; z-index: 2; margin-top: .7rem; padding-top: .6rem; border-top: 1px solid rgba(255,255,255,.25); display: grid; gap: .3rem; }
+    .ig-line { display: flex; align-items: center; justify-content: space-between; gap: .4rem; font-size: .78rem; color: rgba(255,255,255,.92); }
+    .ig-line span:first-child { font-weight: 600; }
+    .ig-line b { font-weight: 750; font-variant-numeric: tabular-nums; font-family: 'JetBrains Mono', Consolas, monospace; font-size: .76rem; }
+    .ig-line .p {
+      font-size: .66rem; font-weight: 700; margin-left: .35rem; padding: .05rem .4rem; border-radius: 999px;
+      background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.25);
+    }
+    .k-ig1 { --k1: #2dd4bf; --k2: #0f766e; --kglow: rgba(20,184,166,.55); }
+    .k-ig2 { --k1: #60a5fa; --k2: #1d4ed8; --kglow: rgba(37,99,235,.55); }
+    .k-ig3 { --k1: #a78bfa; --k2: #6d28d9; --kglow: rgba(124,58,237,.55); }
+    .k-ig4 { --k1: #38bdf8; --k2: #0369a1; --kglow: rgba(2,132,199,.55); }
+    .k-ig5 { --k1: #94a3b8; --k2: #334155; --kglow: rgba(51,65,85,.55); }
+    .k-ig6 { --k1: #818cf8; --k2: #3730a3; --kglow: rgba(67,56,202,.55); }
+
+    .ig-sum-wrap { overflow: auto; border-top: 1px solid var(--border); }
+    .ig-sum-table td { background: var(--surface-solid); color: var(--text); }
+    .ig-sum-table tbody tr:nth-child(even) td { background: var(--surface-2); }
+    .ig-sum-table td.ig-name { font-weight: 700; position: sticky; left: 0; z-index: 5; }
+    .ig-sum-table thead th { text-align: right; background: var(--th-2); font-size: .78rem; }
+    .ig-sum-table thead th:first-child { text-align: left; background: var(--th-1); }
+    .ig-sum-table thead th.pct-el { background: var(--th-3); }
+    .ig-sum-table .cs-prod { color: var(--r-prod-t); }
+    .ig-sum-table .cs-rej  { color: var(--r-rej-t); }
+    .ig-sum-table .cs-rew  { color: var(--r-rew-t); }
+    .ig-sum-table .cs-abc  { color: var(--r-abc-t); }
+    .ig-sum-table .cs-sub  { color: var(--r-sub-t); font-weight: 700; }
+    .ig-sum-table .cs-tot  { color: var(--r-tot-t); font-weight: 800; }
+    .ig-sum-table .cs-pct  { color: var(--r-pct-t); font-weight: 650; }
+    .ig-sum-table tr.r-tot td { background: var(--r-tot) !important; color: var(--r-tot-t); font-weight: 800; }
+    .ig-share { display: block; height: 4px; border-radius: 999px; margin-top: .3rem; background: var(--border); overflow: hidden; min-width: 90px; }
+    .ig-share i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+
+
+    /* ================= V12: measure toggle + % logic ================= */
+    .measure-toggle {
+      display: inline-flex; padding: 4px; gap: 3px; border-radius: 12px;
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
+    }
+    .measure-toggle button {
+      border: 0; cursor: pointer; padding: .42rem .85rem; border-radius: 9px; font-size: .8rem; font-weight: 750;
+      color: rgba(224,242,254,.85); background: transparent !important; letter-spacing: .02em; transition: all .18s ease;
+    }
+    .measure-toggle button:hover:not(:disabled) { color: #fff; background: rgba(255,255,255,.1) !important; }
+    .measure-toggle button.active {
+      color: #fff; background: linear-gradient(135deg, #0ea5e9, #6366f1) !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 6px 14px -6px rgba(99,102,241,.8);
+    }
+    .measure-toggle button:disabled { opacity: .35; cursor: not-allowed; }
+    .measure-chip {
+      display: inline-flex; align-items: center; gap: .35rem; font-size: .72rem; font-weight: 750; color: #fff;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2); padding: .2rem .6rem; border-radius: 999px;
+    }
+    .tabs-actions { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; }
+    .logic-btn .chev { transition: transform .2s ease; display: inline-block; font-size: .7rem; }
+    .logic-btn[aria-expanded="true"] .chev { transform: rotate(180deg); }
+    .logic-btn[aria-expanded="true"] { border-color: var(--accent-ring); color: var(--accent); }
+    #pct-logic { display: none; }
+    #pct-logic.open { display: block; animation: rowIn .25s ease; }
+    .logic-body { padding: 1.1rem 1.3rem 1.3rem; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+    .logic-block h4 { margin: 0 0 .55rem; font-size: .8rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
+    .formula {
+      display: flex; flex-wrap: wrap; align-items: baseline; gap: .35rem; padding: .6rem .8rem; margin-bottom: .45rem;
+      border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border); font-size: .88rem; color: var(--text);
+    }
+    .formula .fx-name { font-weight: 800; color: var(--accent); }
+    .formula .op { color: var(--muted); font-weight: 700; }
+    .formula .fx-note { flex-basis: 100%; font-size: .74rem; color: var(--muted); margin-top: .1rem; }
+    .logic-notes { margin: 0; padding-left: 1.1rem; font-size: .84rem; color: var(--text-2); line-height: 1.6; }
+    .logic-notes b { color: var(--text); }
+    .logic-example .formula { font-family: 'JetBrains Mono', Consolas, monospace; font-size: .8rem; }
+    .logic-example .res { margin-left: auto; font-weight: 800; color: var(--r-pct-t); }
+
+    /* no-data card text */
+    .card.p-8.text-center { color: var(--muted) !important; }
+
+    .app-footer { text-align: center; font-size: .7rem; color: var(--muted); padding: 1.5rem 1rem 2rem; letter-spacing: .03em; }
+
+    @media (max-width: 768px) {
+      .app-header h1 { font-size: 1.05rem; }
+      .filter-grid { grid-template-columns: 1fr 1fr; }
+      .kpi-box .val { font-size: 1.2rem; }
+      .div-tab { padding: .5rem .85rem; font-size: .76rem; }
+      .header-meta { display: none; }
+    }
+    @media (max-width: 480px) { .filter-grid { grid-template-columns: 1fr; } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+    button:focus-visible, input:focus-visible, select:focus-visible, .div-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="max-w-[1750px] mx-auto px-5 py-4 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="brand-mark">VP</div>
+        <div>
+          <h1>VENUS PIPES AND TUBES LTD.</h1>
+          <p class="subtitle">Final Production Engine · QC Final Production Details (PROD + REJP)</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="header-meta">
+          <div id="period-label">Upload data to begin</div>
+          <div id="print-date"></div>
+        </div>
+        <div class="measure-toggle" id="measure-toggle" role="group" aria-label="Report measure">
+          <button type="button" data-m="MT" class="active" title="Report in Metric Tonnes">MT</button>
+          <button type="button" data-m="NOS" title="Report in Production Numbers">No's</button>
+          <button type="button" data-m="MTR" title="Report in Production Meter">Meter</button>
+        </div>
+        <button id="theme-toggle" class="theme-toggle" type="button" title="Toggle light / dark theme" aria-label="Toggle theme">
+          <svg class="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-[1750px] mx-auto px-5 py-6 space-y-5">
+    <section id="upload-section" class="card p-6 sm:p-8">
+      <div id="upload-zone">
+        <input type="file" id="file-input" accept=".xlsx,.xls,.csv" class="hidden" />
+        <div class="upload-icon">📊</div>
+        <p class="upload-title">Drop Final Production Report Excel here</p>
+        <p class="upload-hint">or click to browse · supports .xlsx / .xls / .csv</p>
+        <div class="format-badges">
+          <span>.xlsx</span>
+          <span>.xls</span>
+          <span>.csv</span>
+        </div>
+      </div>
+      <div id="upload-status" class="mt-4 hidden text-center text-sm font-medium"></div>
+    </section>
+
+    <div id="dashboard" class="hidden space-y-5">
+      <section class="card slicer-section">
+        <div class="slicer-header">
+          <div class="slicer-title">
+            <span class="bar"></span>
+            Slicers
+            <span class="badge">dynamic · like Power BI</span>
+          </div>
+          <div class="slicer-actions">
+            <button id="btn-reset" class="btn-reset">↺ Reset All</button>
+            <button id="btn-apply" class="btn-apply">✓ Apply Filters</button>
+          </div>
+        </div>
+        <div class="filter-grid">
+          <div class="filter-item">
+            <div class="label-row">
+              <label>Division</label>
+              <span class="sel-badge all" id="badge-div"></span>
+            </div>
+            <select id="filter-div" multiple placeholder="All Divisions"></select>
+            <div class="slicer-hint" id="hint-div"></div>
+          </div>
+          <div class="filter-item">
+            <div class="label-row">
+              <label>Plant Code</label>
+              <span class="sel-badge all" id="badge-plant"></span>
+            </div>
+            <select id="filter-plant" multiple placeholder="All Plants"></select>
+            <div class="slicer-hint" id="hint-plant"></div>
+          </div>
+          <div class="filter-item">
+            <div class="label-row">
+              <label>Item Group</label>
+              <span class="sel-badge all" id="badge-ig"></span>
+            </div>
+            <select id="filter-ig" multiple placeholder="All Item Groups"></select>
+            <div class="slicer-hint" id="hint-ig"></div>
+          </div>
+          <div class="filter-item">
+            <div class="label-row">
+              <label>Tnature</label>
+              <span class="sel-badge all" id="badge-tnature"></span>
+            </div>
+            <select id="filter-tnature" multiple placeholder="All Tnature"></select>
+            <div class="slicer-hint" id="hint-tnature"></div>
+          </div>
+          <div class="filter-item">
+            <div class="label-row">
+              <label>Godown Code</label>
+              <span class="sel-badge all" id="badge-gcode"></span>
+            </div>
+            <select id="filter-gcode" multiple placeholder="All Godown Codes"></select>
+            <div class="slicer-hint" id="hint-gcode"></div>
+          </div>
+          <div class="filter-item">
+            <div class="label-row">
+              <label>Godown Name</label>
+              <span class="sel-badge all" id="badge-gname"></span>
+            </div>
+            <select id="filter-gname" multiple placeholder="All Godown Names"></select>
+            <div class="slicer-hint" id="hint-gname"></div>
+          </div>
+          <div class="filter-item">
+            <div class="label-row">
+              <label>Year</label>
+              <span class="sel-badge all" id="badge-year"></span>
+            </div>
+            <select id="filter-year" multiple placeholder="All Years"></select>
+            <div class="slicer-hint" id="hint-year"></div>
+          </div>
+          <div class="filter-item">
+            <div class="label-row">
+              <label>Quarter</label>
+              <span class="sel-badge all" id="badge-quarter"></span>
+            </div>
+            <select id="filter-quarter" multiple placeholder="All Quarters"></select>
+            <div class="slicer-hint" id="hint-quarter"></div>
+          </div>
+          <div class="filter-item">
+            <div class="label-row">
+              <label>Month</label>
+              <span class="sel-badge all" id="badge-month"></span>
+            </div>
+            <select id="filter-month" multiple placeholder="All Months"></select>
+            <div class="slicer-hint" id="hint-month"></div>
+          </div>
+          <div class="filter-item">
+            <div class="label-row">
+              <label>Week</label>
+              <span class="sel-badge all" id="badge-week"></span>
+            </div>
+            <select id="filter-week" multiple placeholder="All Weeks"></select>
+            <div class="slicer-hint" id="hint-week"></div>
+          </div>
+          <div class="filter-item">
+            <div class="label-row">
+              <label>Date From</label>
+            </div>
+            <input type="date" id="filter-date-from" />
+          </div>
+          <div class="filter-item">
+            <div class="label-row">
+              <label>Date To</label>
+            </div>
+            <input type="date" id="filter-date-to" />
+          </div>
+        </div>
+        <div id="context-bar" class="hidden"></div>
+      </section>
+
+      <div class="tabs-row">
+        <div class="div-tabs">
+          <div class="div-tab active" data-div="U1">Welded (U1)</div>
+          <div class="div-tab" data-div="U2">Seamless (U2)</div>
+          <div class="div-tab" data-div="BOTH">Both Units</div>
+        </div>
+        <div class="tabs-actions">
+        <button id="toggle-logic" class="pct-toggle logic-btn" type="button" aria-expanded="false" aria-controls="pct-logic" title="Show how % is calculated">
+          <span class="pct-sym">ƒ</span><span>Percentage Calculation Logic</span><span class="chev">▼</span>
+        </button>
+        <button id="toggle-pct" class="pct-toggle" type="button" aria-pressed="true" title="Show / hide % calculations">
+          <span class="pct-sym">%</span><span>% Calculations</span><span class="sw"></span>
+        </button>
+        </div>
+      </div>
+
+      <section id="pct-logic" class="card overflow-hidden">
+        <div class="section-head"><span class="section-title">Percentage Calculation Logic</span><span class="section-sub" id="logic-basis"></span></div>
+        <div class="logic-body">
+          <div class="logic-block">
+            <h4>Base quantities</h4>
+            <div class="formula"><span class="fx-name">Inspection Qty (Prod)</span><span class="op">=</span> Sum of qty where Tnature = PROD</div>
+            <div class="formula"><span class="fx-name">Subtotal Rejp</span><span class="op">=</span> Rejection <span class="op">+</span> Rework <span class="op">+</span> A + B + C<span class="fx-note">A + B + C only for Seamless (U2). Welded (U1) = Rejection + Rework.</span></div>
+            <div class="formula"><span class="fx-name">Total Inspection</span><span class="op">=</span> Inspection Qty (Prod) <span class="op">+</span> Subtotal Rejp<span class="fx-note">This is the denominator for every % on the dashboard.</span></div>
+          </div>
+          <div class="logic-block">
+            <h4>Percentage formulas</h4>
+            <div class="formula"><span class="fx-name">% Rejection</span><span class="op">=</span> Rejection <span class="op">÷</span> Total Inspection <span class="op">× 100</span></div>
+            <div class="formula"><span class="fx-name">% Rework</span><span class="op">=</span> Rework <span class="op">÷</span> Total Inspection <span class="op">× 100</span></div>
+            <div class="formula"><span class="fx-name">% A + B + C</span><span class="op">=</span> (A + B + C) <span class="op">÷</span> Total Inspection <span class="op">× 100</span><span class="fx-note">U2 only.</span></div>
+            <div class="formula"><span class="fx-name">% Total Rejp</span><span class="op">=</span> Subtotal Rejp <span class="op">÷</span> Total Inspection <span class="op">× 100</span></div>
+            <div class="formula"><span class="fx-name">% of inspection</span><span class="op">(KPI)</span><span class="op">=</span> KPI value <span class="op">÷</span> Total Inspection <span class="op">× 100</span></div>
+            <div class="formula"><span class="fx-name">% Share</span><span class="op">(Item Group)</span><span class="op">=</span> Item Group Total Inspection <span class="op">÷</span> Unit Total Inspection <span class="op">× 100</span></div>
+          </div>
+          <div class="logic-block">
+            <h4>Rules</h4>
+            <ul class="logic-notes">
+              <li><b>Item group cell %</b> uses that plant + item group's own Total Inspection.</li>
+              <li><b>Plant Total & Grand Total %</b> = sum of numerators ÷ sum of Total Inspection (weighted). Not an average of the cell %.</li>
+              <li><b>Measure follows header toggle</b> — MT, No's or Meter. Same formula, different quantity, so % on No's basis can differ from MT basis.</li>
+              <li><b>Slicers apply first</b> — % uses only filtered data.</li>
+              <li>Blank / 0 Total Inspection → % left blank (no divide by zero).</li>
+            </ul>
+          </div>
+          <div class="logic-block logic-example">
+            <h4>Live example · current view</h4>
+            <div id="logic-example"><div class="formula">Upload data to see worked example.</div></div>
+          </div>
+        </div>
+      </section>
+
+      <div id="report-U1" class="div-report"></div>
+      <div id="report-U2" class="div-report hidden"></div>
+      <div id="report-BOTH" class="div-report hidden grid grid-cols-1 2xl:grid-cols-2 gap-5"></div>
+
+      <div class="flex flex-wrap gap-3 justify-end pt-1">
+        <button id="btn-excel" class="btn-export btn-excel">⬇ Download Excel Report</button>
+        <button id="btn-html" class="btn-export btn-html">⬇ Download HTML Report</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="app-footer">Venus Pipes &amp; Tubes Ltd. · Final Production Dashboard · Confidential</footer>
+  <script>
+    let rawData = [], filteredData = [], tomSelects = {}, activeDiv = 'U1', lastReportMeta = {};
+    let updatingSlicers = false;
+
+    function parseExcelDate(val) {
+      if (!val) return null;
+      if (val instanceof Date) return new Date(val.getFullYear(), val.getMonth(), val.getDate());
+      if (typeof val === 'number') {
+        var d = XLSX.SSF.parse_date_code(val);
+        if (d) return new Date(d.y, d.m - 1, d.d);
+      }
+      var s = String(val).trim();
+      var m1 = s.match(/^(\d{1,2})[-/ ]([A-Za-z]{3})[-/ ](\d{2,4})$/);
+      if (m1) {
+        var months = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
+        var y = parseInt(m1[3], 10); if (y < 100) y += 2000;
+        return new Date(y, months[m1[2].toUpperCase()], parseInt(m1[1], 10));
+      }
+      var m2 = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (m2) return new Date(+m2[1], +m2[2]-1, +m2[3]);
+      var d2 = new Date(s);
+      if (!isNaN(d2.getTime())) return new Date(d2.getFullYear(), d2.getMonth(), d2.getDate());
+      return null;
+    }
+    /* Parse HTML date input as LOCAL midnight (fixes UTC bug that excluded day 1) */
+    function parseLocalDateInput(str) {
+      if (!str) return null;
+      var p = str.split('-');
+      if (p.length !== 3) return null;
+      return new Date(+p[0], +p[1]-1, +p[2]);
+    }
+    function fmtDate(d) {
+      if (!d) return '';
+      return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    }
+    /* ===== V12 measure switch: MT / Nos / Meter ===== */
+    var MEASURES = {
+      MT:  { label: 'MT',  name: 'Weight (MT)',        dec: 3, xfmt: '#,##0.000' },
+      NOS: { label: "No's", name: 'Production Numbers', dec: 0, xfmt: '#,##0' },
+      MTR: { label: 'Mtr', name: 'Production Meter',   dec: 2, xfmt: '#,##0.00' }
+    };
+    var measure = 'MT';
+    try { var _m = localStorage.getItem('vp-measure'); if (MEASURES[_m]) measure = _m; } catch(e){}
+    function M() { return MEASURES[measure]; }
+    function ZERO() { return (0).toFixed(M().dec); }
+    function toNum(v) {
+      if (v == null || v === '') return 0;
+      if (typeof v === 'number') return v;
+      var n = parseFloat(String(v).replace(/,/g, '').trim());
+      return isNaN(n) ? 0 : n;
+    }
+    function fmtNum(n, dec) {
+      if (dec === undefined) dec = M().dec;
+      if (n == null || isNaN(n) || Math.abs(n) < 1e-12) return '';
+      return Number(n).toLocaleString('en-IN', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+    }
+    function fmtPct(n) {
+      if (n == null || isNaN(n)) return '';
+      return n.toFixed(2) + '%';
+    }
+    /* ISO week number (Mon-start) → "2026-W41" */
+    function isoWeekLabel(d) {
+      var dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      var day = (dt.getDay() + 6) % 7; /* Mon=0 */
+      dt.setDate(dt.getDate() - day + 3); /* Thursday of that week */
+      var firstThu = new Date(dt.getFullYear(), 0, 4);
+      var week = 1 + Math.round((dt - firstThu) / 86400000 / 7);
+      var y = dt.getFullYear();
+      return y + '-W' + String(week).padStart(2, '0');
+    }
+
+    function classifyRejp(code, name) {
+      var c = (code || '').toUpperCase();
+      var n = (name || '').toUpperCase();
+      if (/-A\b/.test(c) || c.endsWith('-A') || /PRIME\s*-\s*A/.test(n) || /\s-\s*A$/.test(n)) return 'A';
+      if (/-B\b/.test(c) || c.endsWith('-B') || c.endsWith('F-B') || /SEMI\s*REJECT\s*-\s*B/.test(n) || /\s-\s*B$/.test(n)) return 'B';
+      if (/-C\b/.test(c) || c.endsWith('-C') || c.endsWith('F-C') || c.endsWith('3-C') || /FINAL\s*REJECT\s*-\s*C/.test(n) || /\s-\s*C$/.test(n)) return 'C';
+      if (/REW/.test(c) || /REWORK/.test(n) || /PIC/.test(c) || /PICKEL|PICKLE/.test(n)) return 'Rework';
+      if (/REJ/.test(c) || /REJECT/.test(n) || /SCR/.test(c) || /SCRAP/.test(n)) return 'Rejection';
+      return 'Rejection';
+    }
+    function normalizeItemGroup(ig) {
+      if (!ig) return 'Unknown';
+      if (/seamless\s*u[-\s]?tube/i.test(String(ig))) return 'FG Seamless';
+      return String(ig).trim();
+    }
+
+    /* ===== V11 business rules (edit here) =====
+       U1 (Welded): no A/B/C godowns. Plant COND → only FG Welded group.
+       U2 (Seamless): A/B/C kept. Plants BA & SMLST → drop Black Round Bar + Mother Hollow. */
+    var ABC_DIVS = { U2: true };
+    var IG_RULES = {
+      U1: { COND:  { keepOnly: [/fg\s*welded/i] } },
+      U2: { BA:    { exclude:  [/black\s*round\s*bar/i, /mother\s*hollow/i] },
+            SMLST: { exclude:  [/black\s*round\s*bar/i, /mother\s*hollow/i] } }
+    };
+    function igAllowed(div, plant, ig) {
+      var d = IG_RULES[String(div||'').toUpperCase()]; if (!d) return true;
+      var rule = d[String(plant||'').toUpperCase().replace(/\s+/g,'')]; if (!rule) return true;
+      if (rule.keepOnly) return rule.keepOnly.some(function(re){ return re.test(ig); });
+      if (rule.exclude) return !rule.exclude.some(function(re){ return re.test(ig); });
+      return true;
+    }
+    function rejKeys(div) { return ABC_DIVS[div] ? ['Rejection','Rework','A','B','C'] : ['Rejection','Rework']; }
+    function unitLabel(div) {
+      return div === 'U1' ? 'Welded (U1)' : div === 'U2' ? 'Seamless (U2)' : div;
+    }
+
+    /* ---- Upload ---- */
+    var uploadZone = document.getElementById('upload-zone');
+    var fileInput = document.getElementById('file-input');
+    uploadZone.addEventListener('click', function(){ fileInput.click(); });
+    uploadZone.addEventListener('dragover', function(e){ e.preventDefault(); uploadZone.classList.add('dragover'); });
+    uploadZone.addEventListener('dragleave', function(){ uploadZone.classList.remove('dragover'); });
+    uploadZone.addEventListener('drop', function(e){ e.preventDefault(); uploadZone.classList.remove('dragover'); if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+    fileInput.addEventListener('change', function(e){ if(e.target.files[0]) handleFile(e.target.files[0]); });
+
+    /* Column alias map — supports both friendly names and system codes from mapping file */
+    var COL_ALIASES = {
+      Division:        ['Division', 'DIV_CODE', 'Div', 'DIVISION'],
+      Tnature:         ['Tnature', 'TNATURE', 'T Nature', 'T_NATURE'],
+      ProductionDate:  ['Production Date', 'VRDATE', 'Prod Date', 'PRODUCTION DATE', 'Date'],
+      PlantCode:       ['Plant Code', 'PLANT_CODE', 'Plant', 'PLANT'],
+      ItemGroup:       ['Item Group name', 'ITEM_GROUP_NAME', 'Item Group', 'ITEM_GROUP', 'ItemGroup'],
+      GodownCode:      ['Godown Code', 'GODOWN_CODE', 'Godown', 'GODOWN'],
+      GodownName:      ['Godown Name', 'GODOWN_NAME', 'GodownName'],
+      Month:           ['Month', 'VR_MONTH', 'MONTH'],
+      ProdWTMT:        ['Prod WT MT', 'Production Qty (MT)', 'PROD WT MT', 'Prod_WT_MT', 'WT MT', 'Production Qty MT'],
+      ProdWTKG:        ['Prod WT KG', 'Production Qty (KG)', 'PROD WT KG'],
+      /* NOTE: 'Production No' is the voucher no. (e.g. F126Y-03804) — never use it for quantity */
+      ProdNos:         ['Prod Nos', 'PROD_NOS', 'Prod No.s', "Prod No's", 'Production Numbers', 'Production Nos', "Production No's", 'Production Numbers (Nos)', 'NOS'],
+      ProdMeter:       ['Prod MTR', 'PROD_MTR', 'Prod Mtr', 'Prod Meter', 'PROD_METER', 'Production Meter', 'Production Meters', 'Production Mtr', 'Production Meter (Mtr)', 'MTR', 'METER']
+    };
+
+    function pickCol(row, aliases) {
+      for (var i = 0; i < aliases.length; i++) {
+        var k = aliases[i];
+        if (row[k] !== undefined && row[k] !== null && String(row[k]).trim() !== '') return row[k];
+      }
+      /* case-insensitive / whitespace-insensitive fallback */
+      var keys = Object.keys(row);
+      for (var a = 0; a < aliases.length; a++) {
+        var target = aliases[a].toLowerCase().replace(/[\s_]+/g, '');
+        for (var ki = 0; ki < keys.length; ki++) {
+          var keyNorm = keys[ki].toLowerCase().replace(/[\s_]+/g, '');
+          if (keyNorm === target) {
+            var v = row[keys[ki]];
+            if (v !== undefined && v !== null && String(v).trim() !== '') return v;
+          }
+        }
+      }
+      return null;
+    }
+
+    /* Numeric-only column pick: tries each alias (exact, then case/space-insensitive), skips text values */
+    function isNumLike(v) {
+      if (v == null) return false;
+      if (typeof v === 'number') return isFinite(v);
+      var t = String(v).replace(/,/g, '').trim();
+      return t !== '' && /^-?\d*\.?\d+(e[-+]?\d+)?$/i.test(t);
+    }
+    function pickNum(row, aliases) {
+      var keys = Object.keys(row);
+      for (var a = 0; a < aliases.length; a++) {
+        if (isNumLike(row[aliases[a]])) return toNum(row[aliases[a]]);
+        var target = aliases[a].toLowerCase().replace(/[\s_.']+/g, '');
+        for (var ki = 0; ki < keys.length; ki++) {
+          if (keys[ki].toLowerCase().replace(/[\s_.']+/g, '') === target && isNumLike(row[keys[ki]])) return toNum(row[keys[ki]]);
+        }
+      }
+      return 0;
+    }
+
+    function isHeaderRow(row) {
+      if (!row || !row.length) return false;
+      var cells = row.map(function(c){ return String(c||'').toLowerCase().replace(/[\s_]+/g, ''); });
+      var hasDiv = cells.some(function(c){ return c === 'division' || c === 'divcode'; });
+      var hasTn  = cells.some(function(c){ return c.indexOf('tnature') >= 0; });
+      var hasPl  = cells.some(function(c){ return c.indexOf('plant') >= 0; });
+      return hasDiv && hasTn && hasPl;
+    }
+
+    function handleFile(file) {
+      var status = document.getElementById('upload-status');
+      status.classList.remove('hidden');
+      status.innerHTML = '<span class="text-sky-600">Reading ' + file.name + '…</span>';
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          var wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array', cellDates: true });
+          var rows = null;
+          for (var si = 0; si < wb.SheetNames.length; si++) {
+            var json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[si]], { header: 1, defval: null, raw: false });
+            var headerIdx = -1;
+            for (var i = 0; i < Math.min(json.length, 20); i++) {
+              if (isHeaderRow(json[i])) { headerIdx = i; break; }
+            }
+            if (headerIdx >= 0 && json.length - headerIdx > 5) {
+              var headers = json[headerIdx].map(function(h){ return String(h||'').trim(); });
+              rows = [];
+              for (var ri = headerIdx + 1; ri < json.length; ri++) {
+                var r = json[ri];
+                if (!r || r.every(function(c){ return c === null || c === undefined || String(c).trim() === ''; })) continue;
+                var obj = {};
+                headers.forEach(function(h, idx){ if (h) obj[h] = r[idx]; });
+                var divVal = pickCol(obj, COL_ALIASES.Division);
+                if (divVal !== null) {
+                  var div = String(divVal).trim().toUpperCase();
+                  if (div !== 'U1' && div !== 'U2') continue;
+                }
+                rows.push(obj);
+              }
+              break;
+            }
+          }
+          if (!rows || !rows.length) throw new Error('No valid data rows found. Check that the file has Division/Tnature/Plant columns.');
+          processRawRows(rows);
+          status.innerHTML = '<span class="text-emerald-600">✓ Loaded ' + rawData.length.toLocaleString() + ' records</span>';
+          document.getElementById('upload-section').classList.add('hidden');
+          document.getElementById('dashboard').classList.remove('hidden');
+          document.getElementById('print-date').textContent = 'Generated: ' + new Date().toLocaleString();
+        } catch(err) {
+          console.error(err);
+          status.innerHTML = '<span class="text-red-600">Error: ' + err.message + '</span>';
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function processRawRows(rows) {
+      rawData = rows.map(function(r) {
+        var code   = String(pickCol(r, COL_ALIASES.GodownCode) || '').trim();
+        var name   = String(pickCol(r, COL_ALIASES.GodownName) || '').trim();
+        var igRaw  = pickCol(r, COL_ALIASES.ItemGroup) || '';
+        var date   = parseExcelDate(pickCol(r, COL_ALIASES.ProductionDate));
+        var mt     = pickNum(r, COL_ALIASES.ProdWTMT);
+        if (!mt) {
+          /* fallback: convert KG → MT if only KG column is present */
+          var kg = pickNum(r, COL_ALIASES.ProdWTKG);
+          if (kg) mt = kg / 1000;
+        }
+        var nos    = pickNum(r, COL_ALIASES.ProdNos);
+        var mtr    = pickNum(r, COL_ALIASES.ProdMeter);
+        var tn = String(pickCol(r, COL_ALIASES.Tnature) || '').trim().toUpperCase();
+        var monthRaw = pickCol(r, COL_ALIASES.Month);
+        return {
+          Division:   String(pickCol(r, COL_ALIASES.Division) || '').trim(),
+          Tnature:    tn,
+          Date:       date,
+          Plant:      String(pickCol(r, COL_ALIASES.PlantCode) || '').trim(),
+          ItemGroup:  normalizeItemGroup(igRaw),
+          GodownCode: code,
+          GodownName: name,
+          RejpCat:    tn === 'REJP' ? classifyRejp(code, name) : null,
+          Month:      String(monthRaw || (date ? date.toLocaleString('en',{month:'short'}).toUpperCase() : '')).trim(),
+          Year:       date ? String(date.getFullYear()) : '',
+          Quarter:    date ? ('Q' + (Math.floor(date.getMonth() / 3) + 1)) : '',
+          Week:       date ? isoWeekLabel(date) : '',
+          WT_MT:      mt,
+          Q_MT:       mt,
+          Q_NOS:      nos,
+          Q_MTR:      mtr
+        };
+      }).filter(function(r){ return (r.Tnature==='PROD'||r.Tnature==='REJP') && r.Division; });
+      rawData.forEach(function(r){
+        r.Division = r.Division.toUpperCase();
+        if (r.RejpCat && !ABC_DIVS[r.Division] && (r.RejpCat==='A'||r.RejpCat==='B'||r.RejpCat==='C')) r.RejpCat = 'Rejection';
+      });
+      rawData = rawData.filter(function(r){ return igAllowed(r.Division, r.Plant, r.ItemGroup); });
+      measureAvail = {
+        MT: true,
+        NOS: rawData.some(function(r){ return r.Q_NOS; }),
+        MTR: rawData.some(function(r){ return r.Q_MTR; })
+      };
+      if (!measureAvail[measure]) measure = 'MT';
+      setMeasure(measure, true);
+
+      var dates = rawData.map(function(r){ return r.Date; }).filter(Boolean).sort(function(a,b){ return a-b; });
+      if (dates.length) {
+        document.getElementById('period-label').textContent =
+          'Period: ' + fmtDate(dates[0]) + ' → ' + fmtDate(dates[dates.length-1]) + '  ·  ' + rawData.length.toLocaleString() + ' records';
+      }
+      initFilters();
+      applyFilters();
+    }
+
+    /* ---- Dynamic slicers (Power BI style) ---- */
+    function getSel(id){ return (tomSelects[id] && tomSelects[id].getValue()) || []; }
+
+    function dataMatchingExcept(excludeKey) {
+      var divs=getSel('filter-div'), plants=getSel('filter-plant'), igs=getSel('filter-ig');
+      var tns=getSel('filter-tnature'), gcodes=getSel('filter-gcode'), gnames=getSel('filter-gname');
+      var years=getSel('filter-year'), quarters=getSel('filter-quarter');
+      var months=getSel('filter-month'), weeks=getSel('filter-week');
+      var fromD=parseLocalDateInput(document.getElementById('filter-date-from').value);
+      var toD=parseLocalDateInput(document.getElementById('filter-date-to').value);
+      if (toD) toD = new Date(toD.getFullYear(), toD.getMonth(), toD.getDate(), 23, 59, 59);
+
+      return rawData.filter(function(r){
+        if (excludeKey!=='Division' && divs.length && divs.indexOf(r.Division)<0) return false;
+        if (excludeKey!=='Plant' && plants.length && plants.indexOf(r.Plant)<0) return false;
+        if (excludeKey!=='ItemGroup' && igs.length && igs.indexOf(r.ItemGroup)<0) return false;
+        if (excludeKey!=='Tnature' && tns.length && tns.indexOf(r.Tnature)<0) return false;
+        if (excludeKey!=='GodownCode' && gcodes.length && gcodes.indexOf(r.GodownCode)<0) return false;
+        if (excludeKey!=='GodownName' && gnames.length && gnames.indexOf(r.GodownName)<0) return false;
+        if (excludeKey!=='Year' && years.length && years.indexOf(r.Year)<0) return false;
+        if (excludeKey!=='Quarter' && quarters.length && quarters.indexOf(r.Quarter)<0) return false;
+        if (excludeKey!=='Month' && months.length && months.indexOf(r.Month)<0) return false;
+        if (excludeKey!=='Week' && weeks.length && weeks.indexOf(r.Week)<0) return false;
+        if (fromD && r.Date && r.Date < fromD) return false;
+        if (toD && r.Date && r.Date > toD) return false;
+        return true;
+      });
+    }
+
+    function uniqueFrom(data, key) {
+      var s = {}; data.forEach(function(r){ if(r[key]) s[r[key]]=1; });
+      return Object.keys(s).sort();
+    }
+
+    function refreshSlicerOptions() {
+      if (updatingSlicers) return;
+      updatingSlicers = true;
+      try {
+        var map = {
+          'filter-div': 'Division',
+          'filter-plant': 'Plant',
+          'filter-ig': 'ItemGroup',
+          'filter-tnature': 'Tnature',
+          'filter-gcode': 'GodownCode',
+          'filter-gname': 'GodownName',
+          'filter-year': 'Year',
+          'filter-quarter': 'Quarter',
+          'filter-month': 'Month',
+          'filter-week': 'Week'
+        };
+        Object.keys(map).forEach(function(fid){
+          var key = map[fid];
+          var avail = uniqueFrom(dataMatchingExcept(key), key);
+          var ts = tomSelects[fid];
+          if (!ts) return;
+          var current = ts.getValue() || [];
+          var keep = current.filter(function(v){ return avail.indexOf(v) >= 0; });
+          ts.clearOptions();
+          avail.forEach(function(o){ ts.addOption({value:o, text:o}); });
+          ts.setValue(keep, true);
+          /* Hint: how many available / selected */
+          var hintId = 'hint-' + fid.replace('filter-','');
+          var hintEl = document.getElementById(hintId);
+          if (hintEl) {
+            var selN = keep.length;
+            var badgeId = 'badge-' + fid.replace('filter-','');
+            var badgeEl = document.getElementById(badgeId);
+            if (selN) {
+              hintEl.innerHTML = '<strong>' + selN + ' of ' + avail.length + '</strong> selected'
+                + (selN <= 3 ? '<span class="hint-vals">' + keep.join(', ') + '</span>' : '');
+              if (badgeEl) {
+                badgeEl.className = 'sel-badge filtered';
+                badgeEl.textContent = selN + ' selected';
+              }
+              var item = hintEl.closest('.filter-item');
+              if (item) item.classList.add('has-selection');
+            } else {
+              hintEl.innerHTML = 'All · ' + avail.length + ' available';
+              if (badgeEl) {
+                badgeEl.className = 'sel-badge all';
+                badgeEl.textContent = avail.length + ' available';
+              }
+              var item2 = hintEl.closest('.filter-item');
+              if (item2) item2.classList.remove('has-selection');
+            }
+          }
+        });
+        /* Context bar: when plant selected, show related godown count */
+        updateContextBar();
+      } finally {
+        updatingSlicers = false;
+      }
+    }
+
+    function updateContextBar() {
+      var bar = document.getElementById('context-bar');
+      var subset = dataMatchingExcept(null);
+      if (!subset.length) { bar.classList.add('hidden'); return; }
+
+      var gCodes = uniqueFrom(subset, 'GodownCode');
+      var plantsAvail = uniqueFrom(subset, 'Plant');
+      var divs = uniqueFrom(subset, 'Division');
+      var records = subset.length;
+      var mt = subset.reduce(function(s,r){ return s+r.WT_MT; }, 0);
+
+      var slicerDefs = [
+        { id: 'filter-div', label: 'Division' },
+        { id: 'filter-plant', label: 'Plant' },
+        { id: 'filter-ig', label: 'Item Group' },
+        { id: 'filter-tnature', label: 'Tnature' },
+        { id: 'filter-gcode', label: 'Godown Code' },
+        { id: 'filter-gname', label: 'Godown Name' },
+        { id: 'filter-year', label: 'Year' },
+        { id: 'filter-quarter', label: 'Quarter' },
+        { id: 'filter-month', label: 'Month' },
+        { id: 'filter-week', label: 'Week' }
+      ];
+      var chips = [];
+      var activeCount = 0;
+      slicerDefs.forEach(function(sd) {
+        var vals = getSel(sd.id);
+        if (vals.length) {
+          activeCount++;
+          var shown = vals.length <= 2 ? vals.join(', ') : (vals[0] + ' +' + (vals.length-1));
+          chips.push('<span class="ctx-chip" title="' + vals.join(', ') + '"><span class="chip-n">' + vals.length + '</span> ' + sd.label + ': ' + shown + '</span>');
+        }
+      });
+      var fromV = document.getElementById('filter-date-from').value;
+      var toV = document.getElementById('filter-date-to').value;
+      if (fromV || toV) {
+        activeCount++;
+        chips.push('<span class="ctx-chip"><span class="chip-n">📅</span> Date: ' + (fromV||'…') + ' → ' + (toV||'…') + '</span>');
+      }
+
+      var html = '<div class="ctx-title">Active Filters · Report Scope</div>';
+      html += '<div class="ctx-stats">';
+      html += '<span><strong>' + records.toLocaleString() + '</strong> records</span>';
+      html += '<span><strong>' + (fmtNum(mt)||ZERO()) + '</strong> ' + M().label + '</span>';
+      html += '<span><strong>' + plantsAvail.length + '</strong> plant(s)</span>';
+      html += '<span><strong>' + gCodes.length + '</strong> godown code(s)</span>';
+      html += '<span><strong>' + divs.map(unitLabel).join(', ') + '</strong></span>';
+      html += '</div>';
+      html += '<div class="ctx-chips">';
+      if (chips.length) {
+        html += chips.join('');
+      } else {
+        html += '<span class="ctx-chip none">No slicer filters applied — showing all data in range</span>';
+      }
+      html += '</div>';
+      bar.innerHTML = html;
+      bar.classList.remove('hidden');
+    }
+
+    function initFilters() {
+      function unique(key) {
+        var s = {}; rawData.forEach(function(r){ if(r[key]) s[r[key]]=1; });
+        return Object.keys(s).sort();
+      }
+      function mk(id, opts) {
+        if (tomSelects[id]) tomSelects[id].destroy();
+        var el = document.getElementById(id);
+        el.innerHTML = '';
+        opts.forEach(function(o){ var op=document.createElement('option'); op.value=o; op.textContent=o; el.appendChild(op); });
+        tomSelects[id] = new TomSelect(el, {
+          plugins: ['remove_button','checkbox_options'], maxItems: null,
+          placeholder: el.getAttribute('placeholder')||'All', closeAfterSelect: false, hideSelected: false,
+          onChange: function(){ if (!updatingSlicers) { refreshSlicerOptions(); } }
+        });
+      }
+      mk('filter-div', unique('Division'));
+      mk('filter-plant', unique('Plant'));
+      mk('filter-ig', unique('ItemGroup'));
+      mk('filter-tnature', unique('Tnature'));
+      mk('filter-gcode', unique('GodownCode'));
+      mk('filter-gname', unique('GodownName'));
+      mk('filter-year', unique('Year'));
+      mk('filter-quarter', unique('Quarter'));
+      mk('filter-month', unique('Month'));
+      mk('filter-week', unique('Week'));
+
+      var dates = rawData.map(function(r){ return r.Date; }).filter(Boolean);
+      if (dates.length) {
+        document.getElementById('filter-date-from').value = fmtDate(new Date(Math.min.apply(null,dates)));
+        document.getElementById('filter-date-to').value = fmtDate(new Date(Math.max.apply(null,dates)));
+      }
+      document.getElementById('filter-date-from').onchange = function(){ refreshSlicerOptions(); };
+      document.getElementById('filter-date-to').onchange = function(){ refreshSlicerOptions(); };
+      refreshSlicerOptions();
+    }
+
+    function applyFilters() {
+      var divs=getSel('filter-div'), plants=getSel('filter-plant'), igs=getSel('filter-ig');
+      var tns=getSel('filter-tnature'), gcodes=getSel('filter-gcode'), gnames=getSel('filter-gname');
+      var years=getSel('filter-year'), quarters=getSel('filter-quarter');
+      var months=getSel('filter-month'), weeks=getSel('filter-week');
+      var fromD=parseLocalDateInput(document.getElementById('filter-date-from').value);
+      var toD=parseLocalDateInput(document.getElementById('filter-date-to').value);
+      if (toD) toD = new Date(toD.getFullYear(), toD.getMonth(), toD.getDate(), 23, 59, 59);
+
+      filteredData = rawData.filter(function(r){
+        if (divs.length && divs.indexOf(r.Division)<0) return false;
+        if (plants.length && plants.indexOf(r.Plant)<0) return false;
+        if (igs.length && igs.indexOf(r.ItemGroup)<0) return false;
+        if (tns.length && tns.indexOf(r.Tnature)<0) return false;
+        if (gcodes.length && gcodes.indexOf(r.GodownCode)<0) return false;
+        if (gnames.length && gnames.indexOf(r.GodownName)<0) return false;
+        if (years.length && years.indexOf(r.Year)<0) return false;
+        if (quarters.length && quarters.indexOf(r.Quarter)<0) return false;
+        if (months.length && months.indexOf(r.Month)<0) return false;
+        if (weeks.length && weeks.indexOf(r.Week)<0) return false;
+        if (fromD && r.Date && r.Date < fromD) return false;
+        if (toD && r.Date && r.Date > toD) return false;
+        return true;
+      });
+      refreshSlicerOptions();
+      renderActive();
+    }
+
+    document.getElementById('btn-apply').addEventListener('click', applyFilters);
+    document.getElementById('btn-reset').addEventListener('click', function(){
+      updatingSlicers = true;
+      Object.keys(tomSelects).forEach(function(k){ tomSelects[k].clear(); });
+      updatingSlicers = false;
+      var dates = rawData.map(function(r){ return r.Date; }).filter(Boolean);
+      if (dates.length) {
+        document.getElementById('filter-date-from').value = fmtDate(new Date(Math.min.apply(null,dates)));
+        document.getElementById('filter-date-to').value = fmtDate(new Date(Math.max.apply(null,dates)));
+      }
+      applyFilters();
+    });
+
+    document.querySelectorAll('.div-tab').forEach(function(tab){
+      tab.addEventListener('click', function(){
+        document.querySelectorAll('.div-tab').forEach(function(t){ t.classList.remove('active'); });
+        tab.classList.add('active');
+        activeDiv = tab.getAttribute('data-div');
+        document.querySelectorAll('.div-report').forEach(function(el){ el.classList.add('hidden'); });
+        document.getElementById('report-'+activeDiv).classList.remove('hidden');
+        renderActive();
+      });
+    });
+
+    var measureAvail = { MT: true, NOS: false, MTR: false };
+    function setMeasure(m, silent) {
+      if (!MEASURES[m]) return;
+      measure = m;
+      rawData.forEach(function(r){ r.WT_MT = m === 'NOS' ? r.Q_NOS : m === 'MTR' ? r.Q_MTR : r.Q_MT; });
+      document.body.setAttribute('data-measure', m);
+      document.querySelectorAll('#measure-toggle button').forEach(function(b){
+        var k = b.getAttribute('data-m');
+        b.classList.toggle('active', k === m);
+        b.disabled = rawData.length ? !measureAvail[k] : false;
+        b.title = b.disabled ? (MEASURES[k].name + ' column not found in file') : ('Report in ' + MEASURES[k].name);
+      });
+      try { localStorage.setItem('vp-measure', m); } catch(e){}
+      if (!silent && rawData.length) { refreshSlicerOptions(); renderActive(); }
+    }
+    document.querySelectorAll('#measure-toggle button').forEach(function(b){
+      b.addEventListener('click', function(){ if (!b.disabled) setMeasure(b.getAttribute('data-m')); });
+    });
+    document.body.setAttribute('data-measure', measure);
+    document.querySelectorAll('#measure-toggle button').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-m') === measure); });
+
+    function updateLogicExample() {
+      var box = document.getElementById('logic-example');
+      document.getElementById('logic-basis').textContent = 'Basis: ' + M().name;
+      var div = activeDiv === 'BOTH' ? 'U2' : activeDiv;
+      var m = lastReportMeta[div];
+      if (!m && activeDiv === 'BOTH') { div = 'U1'; m = lastReportMeta[div]; }
+      if (!m || !m.inspectionTotal) { box.innerHTML = '<div class="formula">No data in current view.</div>'; return; }
+      var T = m.inspectionTotal, c = m.rejpCatTotal, abc = (c.A||0)+(c.B||0)+(c.C||0);
+      var u = ' ' + M().label;
+      function f(v){ return fmtNum(v) || ZERO(); }
+      function line(name, num, extra){
+        return '<div class="formula"><span class="fx-name">'+name+'</span><span class="op">=</span> '+f(num)+(extra||'')+' <span class="op">÷</span> '+f(T)+' <span class="op">× 100</span><span class="res">'+fmtPct(num/T*100)+'</span></div>';
+      }
+      var h = '<div class="formula"><span class="fx-name">'+unitLabel(div)+'</span> Total Inspection <span class="op">=</span> '+f(m.prodTotal)+' <span class="op">+</span> '+f(m.rejpTotal)+' <span class="op">=</span> <b>'+f(T)+u+'</b></div>';
+      h += line('% Rejection', c.Rejection||0);
+      h += line('% Rework', c.Rework||0);
+      if (m.hasABC) h += line('% A + B + C', abc);
+      h += line('% Total Rejp', m.rejpTotal);
+      box.innerHTML = h;
+    }
+
+    function renderActive() {
+      if (activeDiv === 'BOTH') {
+        var bothEl = document.getElementById('report-BOTH');
+        bothEl.innerHTML = buildDivisionReport('U1') + buildDivisionReport('U2');
+        bindExpandToggles(bothEl);
+      } else {
+        var el = document.getElementById('report-'+activeDiv);
+        el.innerHTML = buildDivisionReport(activeDiv);
+        bindExpandToggles(el);
+      }
+      updateLogicExample();
+    }
+
+    function buildDivisionReport(div) {
+      var data = filteredData.filter(function(r){ return r.Division === div; });
+      if (!data.length) return '<div class="card p-8 text-center text-slate-400 font-medium">No data for '+unitLabel(div)+' with current filters</div>';
+      var hasABC = !!ABC_DIVS[div];
+      var RK = rejKeys(div);
+
+      var plantSet={}, igSet={}, plantIgSet={};
+      data.forEach(function(r){
+        plantSet[r.Plant]=1; igSet[r.ItemGroup]=1;
+        (plantIgSet[r.Plant] = plantIgSet[r.Plant] || {})[r.ItemGroup] = 1;
+      });
+      var plants=Object.keys(plantSet).sort(), igs=Object.keys(igSet).sort();
+      var plantIgs = {};
+      plants.forEach(function(p){ plantIgs[p] = Object.keys(plantIgSet[p]).sort(); });
+
+      var prod={}, rejp={Rejection:{},Rework:{},A:{},B:{},C:{}};
+      var byGd = { PROD:{}, Rejection:{}, Rework:{}, A:{}, B:{}, C:{} };
+      var gdNames = {};
+      var prodTotal=0, rejpTotal=0, rejpCatTotal={Rejection:0,Rework:0,A:0,B:0,C:0};
+      var igTot = {};
+
+      data.forEach(function(r){
+        var gd = r.GodownCode || '(blank)';
+        if (r.GodownName) gdNames[gd] = r.GodownName;
+        var t = igTot[r.ItemGroup] || (igTot[r.ItemGroup] = {PROD:0,Rejection:0,Rework:0,A:0,B:0,C:0});
+        if (r.Tnature === 'PROD') {
+          if (!prod[r.Plant]) prod[r.Plant]={};
+          prod[r.Plant][r.ItemGroup] = (prod[r.Plant][r.ItemGroup]||0) + r.WT_MT;
+          prodTotal += r.WT_MT;
+          t.PROD += r.WT_MT;
+          if (!byGd.PROD[gd]) byGd.PROD[gd]={};
+          if (!byGd.PROD[gd][r.Plant]) byGd.PROD[gd][r.Plant]={};
+          byGd.PROD[gd][r.Plant][r.ItemGroup] = (byGd.PROD[gd][r.Plant][r.ItemGroup]||0) + r.WT_MT;
+        } else {
+          var cat = r.RejpCat || 'Rejection';
+          if (!rejp[cat]) rejp[cat]={};
+          if (!rejp[cat][r.Plant]) rejp[cat][r.Plant]={};
+          rejp[cat][r.Plant][r.ItemGroup] = (rejp[cat][r.Plant][r.ItemGroup]||0) + r.WT_MT;
+          rejpCatTotal[cat] = (rejpCatTotal[cat]||0) + r.WT_MT;
+          rejpTotal += r.WT_MT;
+          t[cat] = (t[cat]||0) + r.WT_MT;
+          if (!byGd[cat]) byGd[cat]={};
+          if (!byGd[cat][gd]) byGd[cat][gd]={};
+          if (!byGd[cat][gd][r.Plant]) byGd[cat][gd][r.Plant]={};
+          byGd[cat][gd][r.Plant][r.ItemGroup] = (byGd[cat][gd][r.Plant][r.ItemGroup]||0) + r.WT_MT;
+        }
+      });
+
+      function cell(map,p,ig){ return (map[p]&&map[p][ig])||0; }
+      function abcAt(p,ig){ return cell(rejp.A,p,ig)+cell(rejp.B,p,ig)+cell(rejp.C,p,ig); }
+      function rejAt(p,ig){ var s=0; RK.forEach(function(k){ s+=cell(rejp[k],p,ig); }); return s; }
+
+      var inspectionTotal = prodTotal + rejpTotal;
+      var abcTotal = (rejpCatTotal.A||0)+(rejpCatTotal.B||0)+(rejpCatTotal.C||0);
+      lastReportMeta[div] = { plants:plants, igs:igs, plantIgs:plantIgs, prod:prod, rejp:rejp, prodTotal:prodTotal,
+        rejpCatTotal:rejpCatTotal, rejpTotal:rejpTotal, inspectionTotal:inspectionTotal, hasABC:hasABC, igTot:igTot };
+
+      function pctOf(v){ return inspectionTotal ? fmtPct(v/inspectionTotal*100) + ' of inspection' : null; }
+      function kpi(cls, label, val, pct) {
+        return '<div class="kpi-box '+cls+'"><div class="lbl">'+label+'</div><div class="val">'+(fmtNum(val)||ZERO())+'</div>'
+          + (pct ? '<div class="kpi-pct pct-el">'+pct+'</div>' : '') + '</div>';
+      }
+
+      var html = '';
+      html += '<div class="card overflow-hidden mb-4">';
+      html += '<div class="unit-header">';
+      html += '<span class="unit-name">'+unitLabel(div)+'</span>';
+      html += '<span class="flex items-center gap-2"><span class="measure-chip">Basis: '+M().name+'</span><span class="unit-meta">'+data.length.toLocaleString()+' records</span></span></div>';
+      html += '<div class="grid grid-cols-2 sm:grid-cols-3 '+(hasABC?'lg:grid-cols-6':'lg:grid-cols-5')+' gap-3 p-4">';
+      html += kpi('k-prod', 'Inspection Qty (Prod)', prodTotal, pctOf(prodTotal));
+      html += kpi('k-rej', 'Rejection', rejpCatTotal.Rejection, pctOf(rejpCatTotal.Rejection));
+      html += kpi('k-rew', 'Rework', rejpCatTotal.Rework, pctOf(rejpCatTotal.Rework));
+      if (hasABC) html += kpi('k-abc', 'A + B + C', abcTotal, pctOf(abcTotal));
+      html += kpi('k-sub', 'Subtotal Rejp', rejpTotal, pctOf(rejpTotal));
+      html += kpi('k-tot', 'Total Inspection', inspectionTotal, null);
+      html += '</div></div>';
+
+      var colCount = 1;
+      plants.forEach(function(p){ colCount += plantIgs[p].length + 1; });
+      colCount += 1;
+      var uid = 'rpt-' + div;
+      html += '<div class="card p-0 overflow-hidden"><div class="rpt-wrap"><table class="rpt-table" id="'+uid+'"><thead>';
+      html += '<tr><th class="sticky-col text-left" rowspan="2" style="vertical-align:middle">Particulars</th>';
+      plants.forEach(function(p){ html += '<th class="plant-span" colspan="'+(plantIgs[p].length+1)+'">'+p+'</th>'; });
+      html += '<th class="plant-span" rowspan="2" style="vertical-align:middle;background:var(--th-gt)">Grand<br>Total</th></tr>';
+      html += '<tr>';
+      plants.forEach(function(p){
+        plantIgs[p].forEach(function(ig){ html += '<th class="num ig-sub">'+ig+'</th>'; });
+        html += '<th class="num plant-tot-hdr">Total</th>';
+      });
+      html += '</tr></thead><tbody>';
+
+      function emitCells(getVal) {
+        var row = '', grand = 0;
+        plants.forEach(function(p){
+          var pTot = 0;
+          plantIgs[p].forEach(function(ig){
+            var v = getVal(p,ig)||0; pTot += v;
+            row += '<td class="num">'+(v?fmtNum(v):'')+'</td>';
+          });
+          grand += pTot;
+          row += '<td class="num font-bold">'+(pTot?fmtNum(pTot):'')+'</td>';
+        });
+        row += '<td class="num font-extrabold">'+(grand?fmtNum(grand):'')+'</td></tr>';
+        return row;
+      }
+      function emitRow(label, getVal, cls) {
+        return '<tr class="'+cls+'"><td class="sticky-col">'+label+'</td>' + emitCells(getVal);
+      }
+      function emitPctRow(label, getNum) {
+        var row = '<tr class="r-pct pct-el"><td class="sticky-col">'+label+'</td>';
+        var gN=0, gD=0;
+        plants.forEach(function(p){
+          var pN=0, pD=0;
+          plantIgs[p].forEach(function(ig){
+            var num = getNum(p,ig);
+            var den = cell(prod,p,ig) + rejAt(p,ig); pN+=num; pD+=den;
+            row += '<td class="num">'+(den?fmtPct(num/den*100):'')+'</td>';
+          });
+          gN+=pN; gD+=pD;
+          row += '<td class="num font-bold">'+(pD?fmtPct(pN/pD*100):'')+'</td>';
+        });
+        row += '<td class="num font-extrabold">'+(gD?fmtPct(gN/gD*100):'')+'</td></tr>';
+        return row;
+      }
+      function emitExpandable(groupId, label, getVal, parentCls, childCls, gdMap, catTag) {
+        var gdList = Object.keys(gdMap || {}).sort();
+        var canExpand = gdList.length > 0;
+        var labelHtml = canExpand
+          ? '<span class="expand-toggle" data-group="'+groupId+'"><span class="expand-chevron">▶</span><span>'+label+'</span><span class="expand-hint">('+gdList.length+' godown'+(gdList.length===1?'':'s')+')</span></span>'
+          : label;
+        var row = '<tr class="'+parentCls+(canExpand?' expandable':'')+'" data-group="'+groupId+'"><td class="sticky-col">'+labelHtml+'</td>' + emitCells(getVal);
+        gdList.forEach(function(gd){
+          var name = gdNames[gd] || '';
+          var tag = catTag ? (' <span style="opacity:.55;font-size:0.66rem">['+catTag(gd)+']</span>') : '';
+          var childLabel = gd + (name ? '<span class="gd-name">'+name+'</span>' : '') + tag;
+          row += '<tr class="child-gd '+childCls+'" data-parent="'+groupId+'"><td class="sticky-col">'+childLabel+'</td>'
+            + emitCells(function(p,ig){ return (gdMap[gd] && gdMap[gd][p] && gdMap[gd][p][ig]) || 0; });
+        });
+        return row;
+      }
+
+      html += emitExpandable(uid+'-prod', 'Tnature PROD — Inspection Qty',
+        function(p,ig){ return cell(prod,p,ig); }, 'r-prod', 'r-prod-child', byGd.PROD, null);
+      html += '<tr class="r-rejp-h"><td class="sticky-col" colspan="'+colCount+'">Tnature REJP — Further Bifurcation</td></tr>';
+      html += emitExpandable(uid+'-rej', 'Rejection',
+        function(p,ig){ return cell(rejp.Rejection,p,ig); }, 'r-rej', 'r-rej-child', byGd.Rejection, null);
+      html += emitExpandable(uid+'-rew', 'Rework',
+        function(p,ig){ return cell(rejp.Rework,p,ig); }, 'r-rew', 'r-rew-child', byGd.Rework, null);
+      if (hasABC) {
+        var abcGdMap = {}, abcGdCat = {};
+        ['A','B','C'].forEach(function(k){
+          Object.keys(byGd[k]||{}).forEach(function(gd){
+            abcGdCat[gd] = k;
+            if (!abcGdMap[gd]) abcGdMap[gd] = {};
+            Object.keys(byGd[k][gd]).forEach(function(p){
+              if (!abcGdMap[gd][p]) abcGdMap[gd][p] = {};
+              Object.keys(byGd[k][gd][p]).forEach(function(ig){
+                abcGdMap[gd][p][ig] = (abcGdMap[gd][p][ig]||0) + byGd[k][gd][p][ig];
+              });
+            });
+          });
+        });
+        html += emitExpandable(uid+'-abc', 'A + B + C', abcAt, 'r-abc', 'r-abc-child', abcGdMap, function(gd){ return abcGdCat[gd]||''; });
+      }
+      html += emitRow('Subtotal (Tnature REJP)', rejAt, 'r-sub');
+      html += emitRow('Total Inspection (Grand Total)', function(p,ig){ return cell(prod,p,ig) + rejAt(p,ig); }, 'r-tot');
+      if (hasABC) {
+        html += emitRow('Godown A', function(p,ig){ return cell(rejp.A,p,ig); }, 'r-a');
+        html += emitRow('Godown B', function(p,ig){ return cell(rejp.B,p,ig); }, 'r-b');
+        html += emitRow('Godown C', function(p,ig){ return cell(rejp.C,p,ig); }, 'r-c');
+      }
+      html += emitPctRow('% Rejection', function(p,ig){ return cell(rejp.Rejection,p,ig); });
+      html += emitPctRow('% Rework', function(p,ig){ return cell(rejp.Rework,p,ig); });
+      if (hasABC) html += emitPctRow('% A + B + C', abcAt);
+      html += emitPctRow('% Total Rejp', rejAt);
+      html += '</tbody></table></div></div>';
+
+      html += buildItemGroupSummary(div);
+      return html;
+    }
+
+    /* ===== Item Group wise KPIs + summary table ===== */
+    function igRowVals(div, t) {
+      var abc = (t.A||0)+(t.B||0)+(t.C||0);
+      var rej = (t.Rejection||0) + (t.Rework||0) + (ABC_DIVS[div] ? abc : 0);
+      return { prod: t.PROD||0, rejection: t.Rejection||0, rework: t.Rework||0, abc: abc, sub: rej, ins: (t.PROD||0) + rej };
+    }
+    function buildItemGroupSummary(div) {
+      var m = lastReportMeta[div]; if (!m) return '';
+      var hasABC = m.hasABC;
+      var list = m.igs.map(function(ig){ var v = igRowVals(div, m.igTot[ig]); v.ig = ig; return v; })
+        .sort(function(a,b){ return b.ins - a.ins; });
+      var T = { prod:0, rejection:0, rework:0, abc:0, sub:0, ins:0 };
+      list.forEach(function(v){ Object.keys(T).forEach(function(k){ T[k] += v[k]; }); });
+      function pc(n,d){ return d ? fmtPct(n/d*100) : ''; }
+      var PAL = ['k-ig1','k-ig2','k-ig3','k-ig4','k-ig5','k-ig6'];
+
+      var h = '<div class="card overflow-hidden mt-4">';
+      h += '<div class="section-head"><span class="section-title">Item Group Wise Summary</span>'
+        + '<span class="section-sub">'+unitLabel(div)+' · '+list.length+' item group'+(list.length===1?'':'s')+'</span></div>';
+
+      h += '<div class="ig-grid">';
+      list.forEach(function(v, i){
+        h += '<div class="kpi-box ig-kpi '+PAL[i%PAL.length]+'">';
+        h += '<div class="lbl">'+v.ig+'</div>';
+        h += '<div class="val">'+(fmtNum(v.ins)||ZERO())+'</div>';
+        h += '<div class="ig-cap">Total Inspection<span class="pct-el"> · '+pc(v.ins, T.ins)+' share</span></div>';
+        h += '<div class="ig-break">';
+        h += '<div class="ig-line"><span>Inspection (Prod)</span><b>'+(fmtNum(v.prod)||ZERO())+'</b></div>';
+        h += '<div class="ig-line"><span>Rejection</span><b>'+(fmtNum(v.rejection)||ZERO())+'<span class="p pct-el">'+(pc(v.rejection,v.ins)||'0.00%')+'</span></b></div>';
+        h += '<div class="ig-line"><span>Rework</span><b>'+(fmtNum(v.rework)||ZERO())+'<span class="p pct-el">'+(pc(v.rework,v.ins)||'0.00%')+'</span></b></div>';
+        if (hasABC) h += '<div class="ig-line"><span>A + B + C</span><b>'+(fmtNum(v.abc)||ZERO())+'<span class="p pct-el">'+(pc(v.abc,v.ins)||'0.00%')+'</span></b></div>';
+        h += '<div class="ig-line"><span>Subtotal Rejp</span><b>'+(fmtNum(v.sub)||ZERO())+'<span class="p pct-el">'+(pc(v.sub,v.ins)||'0.00%')+'</span></b></div>';
+        h += '</div></div>';
+      });
+      h += '</div>';
+
+      h += '<div class="ig-sum-wrap"><table class="rpt-table ig-sum-table"><thead><tr>';
+      h += '<th>Item Group</th><th>Inspection Qty (Prod)</th><th>Rejection</th><th>Rework</th>';
+      if (hasABC) h += '<th>A + B + C</th>';
+      h += '<th>Subtotal Rejp</th><th>Total Inspection</th>';
+      h += '<th class="pct-el">% Rejection</th><th class="pct-el">% Rework</th>';
+      if (hasABC) h += '<th class="pct-el">% A + B + C</th>';
+      h += '<th class="pct-el">% Total Rejp</th><th class="pct-el">% Share</th>';
+      h += '</tr></thead><tbody>';
+      function row(v, label, cls) {
+        var r = '<tr class="'+(cls||'')+'"><td class="ig-name">'+label+'</td>';
+        r += '<td class="num cs-prod">'+(fmtNum(v.prod)||'–')+'</td>';
+        r += '<td class="num cs-rej">'+(fmtNum(v.rejection)||'–')+'</td>';
+        r += '<td class="num cs-rew">'+(fmtNum(v.rework)||'–')+'</td>';
+        if (hasABC) r += '<td class="num cs-abc">'+(fmtNum(v.abc)||'–')+'</td>';
+        r += '<td class="num cs-sub">'+(fmtNum(v.sub)||'–')+'</td>';
+        r += '<td class="num cs-tot">'+(fmtNum(v.ins)||'–')+'</td>';
+        r += '<td class="num cs-pct pct-el">'+(pc(v.rejection,v.ins)||'–')+'</td>';
+        r += '<td class="num cs-pct pct-el">'+(pc(v.rework,v.ins)||'–')+'</td>';
+        if (hasABC) r += '<td class="num cs-pct pct-el">'+(pc(v.abc,v.ins)||'–')+'</td>';
+        r += '<td class="num cs-pct pct-el">'+(pc(v.sub,v.ins)||'–')+'</td>';
+        var share = T.ins ? v.ins/T.ins*100 : 0;
+        r += '<td class="num cs-pct pct-el">'+(T.ins?fmtPct(share):'–')+'<span class="ig-share"><i style="width:'+Math.min(100,share).toFixed(1)+'%"></i></span></td>';
+        return r + '</tr>';
+      }
+      list.forEach(function(v){ h += row(v, v.ig, ''); });
+      h += row(T, 'Grand Total', 'r-tot');
+      h += '</tbody></table></div></div>';
+      return h;
+    }
+
+    /* Wire expand/collapse after table is in DOM */
+    function bindExpandToggles(container) {
+      if (!container) return;
+      container.querySelectorAll('.expand-toggle').forEach(function(btn){
+        btn.addEventListener('click', function(e){
+          e.stopPropagation();
+          var group = btn.getAttribute('data-group');
+          var parentRow = btn.closest('tr');
+          var open = parentRow.classList.toggle('expanded');
+          container.querySelectorAll('tr.child-gd[data-parent="'+group+'"]').forEach(function(ch){
+            if (open) ch.classList.add('open'); else ch.classList.remove('open');
+          });
+        });
+      });
+    }
+
+    /* Export Excel — formatted like dashboard */
+    document.getElementById('btn-excel').addEventListener('click', function(){
+      if (!filteredData.length) { alert('No data'); return; }
+
+      function sc(fill, bold, color, align) {
+        var s = {
+          fill: { patternType: 'solid', fgColor: { rgb: fill } },
+          font: { bold: !!bold, color: { rgb: color || '1E293B' }, sz: 10, name: 'Calibri' },
+          alignment: { horizontal: align || 'right', vertical: 'center', wrapText: true },
+          border: {
+            top: { style: 'thin', color: { rgb: 'CBD5E1' } },
+            bottom: { style: 'thin', color: { rgb: 'CBD5E1' } },
+            left: { style: 'thin', color: { rgb: 'CBD5E1' } },
+            right: { style: 'thin', color: { rgb: 'CBD5E1' } }
+          }
+        };
+        return s;
+      }
+      var STY = {
+        hdrPlant: sc('0B3D5C', true, 'FFFFFF', 'center'),
+        hdrIg:    sc('164E6F', true, 'FFFFFF', 'center'),
+        hdrTot:   sc('0A334D', true, 'FFFFFF', 'center'),
+        hdrGt:    sc('062536', true, 'FFFFFF', 'center'),
+        hdrLabel: sc('0B3D5C', true, 'FFFFFF', 'left'),
+        prod:     sc('D1FAE5', true, '064E3B', 'right'),
+        prodL:    sc('D1FAE5', true, '064E3B', 'left'),
+        rejpH:    sc('FECACA', true, '7F1D1D', 'left'),
+        rej:      sc('FEE2E2', false, '991B1B', 'right'),
+        rejL:     sc('FEE2E2', false, '991B1B', 'left'),
+        rew:      sc('FFEDD5', false, '9A3412', 'right'),
+        rewL:     sc('FFEDD5', false, '9A3412', 'left'),
+        abc:      sc('FCE7F3', true, '9D174D', 'right'),
+        abcL:     sc('FCE7F3', true, '9D174D', 'left'),
+        sub:      sc('FEF3C7', true, '854D0E', 'right'),
+        subL:     sc('FEF3C7', true, '854D0E', 'left'),
+        tot:      sc('BFDBFE', true, '1E3A8A', 'right'),
+        totL:     sc('BFDBFE', true, '1E3A8A', 'left'),
+        ga:       sc('E0E7FF', false, '3730A3', 'right'),
+        gaL:      sc('E0E7FF', false, '3730A3', 'left'),
+        gb:       sc('EDE9FE', false, '5B21B6', 'right'),
+        gbL:      sc('EDE9FE', false, '5B21B6', 'left'),
+        gc:       sc('FAE8FF', false, '86198F', 'right'),
+        gcL:      sc('FAE8FF', false, '86198F', 'left'),
+        pct:      sc('F5F3FF', true, '5B21B6', 'right'),
+        pctL:     sc('F5F3FF', true, '5B21B6', 'left'),
+        title:    sc('0B3D5C', true, 'FFFFFF', 'left'),
+        kpi:      sc('EFF6FF', true, '1E3A8A', 'center'),
+        blank:    sc('FFFFFF', false, '1E293B', 'right')
+      };
+
+      var wb = XLSX.utils.book_new();
+      var divs = activeDiv === 'BOTH' ? ['U1','U2'] : [activeDiv];
+
+      divs.forEach(function(div){
+        var m = lastReportMeta[div]; if (!m) return;
+        var plants = m.plants, plantIgs = m.plantIgs, prod = m.prod, rejp = m.rejp, hasABC = m.hasABC;
+        var RK = rejKeys(div);
+        var colCount = 1; plants.forEach(function(p){ colCount += plantIgs[p].length + 1; }); colCount += 1;
+        function rejAtX(p,ig){ var s=0; RK.forEach(function(k){ s+=(rejp[k][p]&&rejp[k][p][ig])||0; }); return s; }
+
+        /* Title + KPI summary rows */
+        var aoa = [];
+        var titleRow = [unitLabel(div) + ' — Final Production Report  ·  Basis: ' + M().name];
+        for (var i = 1; i < colCount; i++) titleRow.push('');
+        aoa.push(titleRow);
+
+        var kpiRow = [
+          'Inspection Qty: ' + (m.prodTotal ? m.prodTotal.toFixed(M().dec) : '0'),
+          'Rejection: ' + ((m.rejpCatTotal.Rejection||0).toFixed(M().dec)),
+          'Rework: ' + ((m.rejpCatTotal.Rework||0).toFixed(M().dec))
+        ];
+        if (hasABC) kpiRow.push('A+B+C: ' + (((m.rejpCatTotal.A||0)+(m.rejpCatTotal.B||0)+(m.rejpCatTotal.C||0)).toFixed(M().dec)));
+        kpiRow.push('Subtotal Rejp: ' + ((m.inspectionTotal - m.prodTotal) ? (m.inspectionTotal - m.prodTotal).toFixed(M().dec) : '0'));
+        kpiRow.push('Total Inspection: ' + (m.inspectionTotal ? m.inspectionTotal.toFixed(M().dec) : '0'));
+        while (kpiRow.length < colCount) kpiRow.push('');
+        aoa.push(kpiRow);
+        aoa.push([]); /* blank spacer */
+
+        /* Header row 1 — Plant names */
+        var h1 = ['Particulars'];
+        plants.forEach(function(p){
+          h1.push(p);
+          for (var i = 0; i < plantIgs[p].length; i++) h1.push('');
+        });
+        h1.push('Grand Total');
+        aoa.push(h1);
+
+        /* Header row 2 — Item groups */
+        var h2 = [''];
+        plants.forEach(function(p){
+          plantIgs[p].forEach(function(ig){ h2.push(ig); });
+          h2.push('Total');
+        });
+        h2.push('');
+        aoa.push(h2);
+
+        function numOrNull(v){ return (v && Math.abs(v) > 1e-12) ? +v.toFixed(6) : null; }
+
+        function push(label, fn) {
+          var row = [label], g = 0;
+          plants.forEach(function(p){
+            var pt = 0;
+            plantIgs[p].forEach(function(ig){
+              var v = fn(p, ig) || 0;
+              pt += v;
+              row.push(numOrNull(v));
+            });
+            g += pt;
+            row.push(numOrNull(pt));
+          });
+          row.push(numOrNull(g));
+          aoa.push(row);
+        }
+
+        var dataStart = aoa.length; /* first data row index */
+
+        push('Tnature PROD — Inspection Qty', function(p,ig){ return (prod[p]&&prod[p][ig])||0; });
+        aoa.push(['Tnature REJP — Further Bifurcation']);
+        push('Rejection', function(p,ig){ return (rejp.Rejection[p]&&rejp.Rejection[p][ig])||0; });
+        push('Rework', function(p,ig){ return (rejp.Rework[p]&&rejp.Rework[p][ig])||0; });
+        if (hasABC) push('A + B + C', function(p,ig){ var s=0; ['A','B','C'].forEach(function(k){ s+=(rejp[k][p]&&rejp[k][p][ig])||0; }); return s; });
+        push('Subtotal (Tnature REJP)', rejAtX);
+        push('Total Inspection (Grand Total)', function(p,ig){ return ((prod[p]&&prod[p][ig])||0) + rejAtX(p,ig); });
+        if (hasABC) {
+          push('Godown A', function(p,ig){ return (rejp.A[p]&&rejp.A[p][ig])||0; });
+          push('Godown B', function(p,ig){ return (rejp.B[p]&&rejp.B[p][ig])||0; });
+          push('Godown C', function(p,ig){ return (rejp.C[p]&&rejp.C[p][ig])||0; });
+        }
+
+        /* % rows */
+        function pushPct(label, getNum) {
+          var row = [label], gN = 0, gD = 0;
+          plants.forEach(function(p){
+            var pN = 0, pD = 0;
+            plantIgs[p].forEach(function(ig){
+              var num = getNum(p, ig);
+              var den = ((prod[p]&&prod[p][ig])||0) + rejAtX(p, ig);
+              pN += num; pD += den;
+              row.push(den ? +(num/den*100).toFixed(2) : null);
+            });
+            gN += pN; gD += pD;
+            row.push(pD ? +(pN/pD*100).toFixed(2) : null);
+          });
+          row.push(gD ? +(gN/gD*100).toFixed(2) : null);
+          aoa.push(row);
+        }
+        pushPct('% Rejection', function(p,ig){ return (rejp.Rejection[p]&&rejp.Rejection[p][ig])||0; });
+        pushPct('% Rework', function(p,ig){ return (rejp.Rework[p]&&rejp.Rework[p][ig])||0; });
+        if (hasABC) pushPct('% A + B + C', function(p,ig){ var s=0; ['A','B','C'].forEach(function(k){ s+=(rejp[k][p]&&rejp[k][p][ig])||0; }); return s; });
+        pushPct('% Total Rejp', rejAtX);
+
+        /* Item Group wise summary block */
+        aoa.push([]);
+        var sumTitleRow = aoa.length;
+        aoa.push(['Item Group Wise Summary']);
+        var sumHdrRow = aoa.length;
+        var sh = ['Item Group','Inspection Qty (Prod)','Rejection','Rework'];
+        if (hasABC) sh.push('A + B + C');
+        sh = sh.concat(['Subtotal Rejp','Total Inspection','% Rejection','% Rework']);
+        if (hasABC) sh.push('% A + B + C');
+        sh = sh.concat(['% Total Rejp','% Share']);
+        aoa.push(sh);
+        var sumNumCols = hasABC ? 7 : 6;
+        var igList = m.igs.map(function(ig){ var v = igRowVals(div, m.igTot[ig]); v.ig = ig; return v; })
+          .sort(function(a,b){ return b.ins - a.ins; });
+        var ST = { prod:0, rejection:0, rework:0, abc:0, sub:0, ins:0 };
+        igList.forEach(function(v){ Object.keys(ST).forEach(function(k){ ST[k] += v[k]; }); });
+        function p2(n,d){ return d ? +(n/d*100).toFixed(2) : null; }
+        function sumRow(v, label){
+          var r = [label, numOrNull(v.prod), numOrNull(v.rejection), numOrNull(v.rework)];
+          if (hasABC) r.push(numOrNull(v.abc));
+          r.push(numOrNull(v.sub), numOrNull(v.ins), p2(v.rejection,v.ins), p2(v.rework,v.ins));
+          if (hasABC) r.push(p2(v.abc,v.ins));
+          r.push(p2(v.sub,v.ins), p2(v.ins, ST.ins));
+          aoa.push(r);
+        }
+        var sumStart = aoa.length;
+        igList.forEach(function(v){ sumRow(v, v.ig); });
+        var sumTotRow = aoa.length;
+        sumRow(ST, 'Grand Total');
+
+        var ws = XLSX.utils.aoa_to_sheet(aoa);
+
+        /* Merges for plant headers */
+        var merges = [{ s: { r: 0, c: 0 }, e: { r: 0, c: colCount - 1 } }];
+        var col = 1;
+        plants.forEach(function(p){
+          var span = plantIgs[p].length + 1;
+          if (span > 1) merges.push({ s: { r: 3, c: col }, e: { r: 3, c: col + span - 1 } });
+          col += span;
+        });
+        /* Grand Total header vertical merge is row 3-4 col last */
+        merges.push({ s: { r: 3, c: colCount - 1 }, e: { r: 4, c: colCount - 1 } });
+        /* Particulars vertical merge row 3-4 */
+        merges.push({ s: { r: 3, c: 0 }, e: { r: 4, c: 0 } });
+        merges.push({ s: { r: sumTitleRow, c: 0 }, e: { r: sumTitleRow, c: sh.length - 1 } });
+        ws['!merges'] = merges;
+
+        /* Column widths */
+        ws['!cols'] = [{ wch: 36 }].concat(Array(Math.max(colCount, sh.length) - 1).fill({ wch: 14 }));
+        ws['!rows'] = [{ hpt: 28 }, { hpt: 22 }, { hpt: 8 }, { hpt: 22 }, { hpt: 20 }];
+
+        /* Apply styles cell by cell */
+        var range = XLSX.utils.decode_range(ws['!ref']);
+        for (var R = 0; R <= range.e.r; R++) {
+          for (var C = 0; C <= range.e.c; C++) {
+            var addr = XLSX.utils.encode_cell({ r: R, c: C });
+            if (!ws[addr]) ws[addr] = { t: 's', v: '' };
+            var cell = ws[addr];
+            var label = (aoa[R] && aoa[R][0]) ? String(aoa[R][0]) : '';
+
+            if (R >= sumTitleRow) {
+              if (R === sumTitleRow) cell.s = STY.title;
+              else if (R === sumHdrRow) cell.s = (C === 0) ? STY.hdrLabel : (C > sumNumCols ? STY.hdrTot : STY.hdrIg);
+              else if (R === sumTotRow) cell.s = (C === 0) ? STY.totL : STY.tot;
+              else if (R >= sumStart) cell.s = (C === 0) ? STY.subL : (C > sumNumCols ? STY.pct : STY.blank);
+              else cell.s = STY.blank;
+              if (R >= sumStart && C > 0 && typeof cell.v === 'number') cell.z = (C > sumNumCols) ? '0.00"%"' : M().xfmt;
+              continue;
+            }
+            if (C >= colCount) { cell.s = STY.blank; continue; }
+            if (R === 0) {
+              cell.s = STY.title;
+            } else if (R === 1) {
+              cell.s = STY.kpi;
+            } else if (R === 2) {
+              cell.s = STY.blank;
+            } else if (R === 3) {
+              if (C === 0) cell.s = STY.hdrLabel;
+              else if (C === colCount - 1) cell.s = STY.hdrGt;
+              else cell.s = STY.hdrPlant;
+            } else if (R === 4) {
+              if (C === 0) cell.s = STY.hdrLabel;
+              else {
+                /* check if this is a Plant Total column */
+                var isTot = false;
+                var cc = 1;
+                plants.forEach(function(p){
+                  cc += plantIgs[p].length;
+                  if (C === cc) isTot = true;
+                  cc += 1;
+                });
+                cell.s = (C === colCount - 1) ? STY.hdrGt : (isTot ? STY.hdrTot : STY.hdrIg);
+              }
+            } else {
+              /* Data rows — pick style by label */
+              var isLeft = (C === 0);
+              var sty = STY.blank;
+              if (label.indexOf('PROD') >= 0) sty = isLeft ? STY.prodL : STY.prod;
+              else if (label.indexOf('Further Bifurcation') >= 0) sty = STY.rejpH;
+              else if (label === 'Rejection') sty = isLeft ? STY.rejL : STY.rej;
+              else if (label === 'Rework') sty = isLeft ? STY.rewL : STY.rew;
+              else if (label.indexOf('A + B + C') >= 0 && label.indexOf('%') < 0) sty = isLeft ? STY.abcL : STY.abc;
+              else if (label.indexOf('Subtotal') >= 0) sty = isLeft ? STY.subL : STY.sub;
+              else if (label.indexOf('Total Inspection') >= 0) sty = isLeft ? STY.totL : STY.tot;
+              else if (label === 'Godown A') sty = isLeft ? STY.gaL : STY.ga;
+              else if (label === 'Godown B') sty = isLeft ? STY.gbL : STY.gb;
+              else if (label === 'Godown C') sty = isLeft ? STY.gcL : STY.gc;
+              else if (label.indexOf('%') === 0) sty = isLeft ? STY.pctL : STY.pct;
+              cell.s = sty;
+
+              /* Number format */
+              if (C > 0 && typeof cell.v === 'number') {
+                if (label.indexOf('%') === 0) cell.z = '0.00"%"';
+                else cell.z = M().xfmt;
+              }
+            }
+          }
+        }
+
+        var sheetName = unitLabel(div).replace(/[()]/g, '').trim().substring(0, 31);
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+      });
+
+      XLSX.writeFile(wb, 'Venus_Final_Production_Report_' + (activeDiv === 'BOTH' ? 'Both' : activeDiv) + '_' + measure + '.xlsx');
+    });
+
+    document.getElementById('btn-html').addEventListener('click', function(){
+      if (!filteredData.length) { alert('No data'); return; }
+      var divs = activeDiv==='BOTH' ? ['U1','U2'] : [activeDiv];
+      var body = ''; divs.forEach(function(d){ body += buildDivisionReport(d); });
+      var css = 'body{font-family:Segoe UI,system-ui,sans-serif;background:#eef2f7;padding:24px}.card{background:#fff;border-radius:14px;margin-bottom:16px;box-shadow:0 4px 24px rgba(11,61,92,.08)}.kpi-box{border-radius:12px;padding:14px;text-align:center}.kpi-box .lbl{font-size:10px;text-transform:uppercase;font-weight:600}.kpi-box .val{font-size:1.5rem;font-weight:800}.k-prod{background:#d1fae5;color:#065f46}.k-rej{background:#fecaca;color:#991b1b}.k-rew{background:#fed7aa;color:#9a3412}.k-abc{background:#fbcfe8;color:#9d174d}.k-sub{background:#fde68a;color:#92400e}.k-tot{background:#bfdbfe;color:#1e3a8a}.rpt-table{border-collapse:collapse;width:100%;font-size:.76rem}.rpt-table th,.rpt-table td{border:1px solid #e2e8f0;padding:7px 10px;white-space:nowrap}.rpt-table thead th{color:#fff;background:#0b3d5c}.num{text-align:right}.plant-span{background:#0b3d5c;text-align:center}.ig-sub{background:#164e6f;font-size:.7rem}.plant-tot-hdr{background:#0a334d}.r-prod{background:#d1fae5;font-weight:700}.r-rejp-h{background:#fecaca;font-weight:700}.r-rej{background:#fee2e2}.r-rew{background:#ffedd5}.r-abc{background:#fce7f3;font-weight:600}.r-sub{background:#fef3c7;font-weight:700}.r-tot{background:#bfdbfe;font-weight:800}.r-a{background:#e0e7ff}.r-b{background:#ede9fe}.r-c{background:#fae8ff}.r-pct{background:#f5f3ff;font-weight:600}h1{color:#0b3d5c}.kpi-pct{font-size:11px;opacity:.8}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;padding:14px}.unit-header{background:#0b3d5c;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;font-weight:700}.section-head{padding:12px 16px;font-weight:800;color:#0b3d5c;display:flex;justify-content:space-between}.ig-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;padding:14px}.ig-kpi{background:#eff6ff;color:#1e3a8a;text-align:left}.ig-line{display:flex;justify-content:space-between;font-size:12px}.ig-line .p{margin-left:6px;color:#5b21b6}.ig-cap{font-size:11px}.ig-share{display:none}.ig-sum-table thead th{text-align:right}.ig-sum-table thead th:first-child{text-align:left}.rpt-wrap,.ig-sum-wrap{overflow:auto}';
+      var full = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Venus Final Production Report</title><style>'+css+'</style></head><body><h1>VENUS PIPES AND TUBES LTD.</h1><p>Generated '+new Date().toLocaleString()+' · Basis: '+M().name+'</p>'+body+'</body></html>';
+      var blob = new Blob([full], {type:'text/html'});
+      var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+      a.download = 'Venus_Final_Production_Report_'+(activeDiv==='BOTH'?'Both':activeDiv)+'_'+measure+'.html';
+      a.click(); URL.revokeObjectURL(a.href);
+    });
+  </script>
+  <script>
+    (function(){
+      var btn = document.getElementById('toggle-pct');
+      var hide = false; try { hide = localStorage.getItem('vp-hide-pct') === '1'; } catch(e){}
+      function apply(){ document.body.classList.toggle('hide-pct', hide); btn.setAttribute('aria-pressed', hide ? 'false' : 'true'); }
+      apply();
+      btn.addEventListener('click', function(){ hide = !hide; apply(); try { localStorage.setItem('vp-hide-pct', hide ? '1' : '0'); } catch(e){} });
+    })();
+    (function(){
+      var b = document.getElementById('toggle-logic'), p = document.getElementById('pct-logic');
+      b.addEventListener('click', function(){
+        var open = p.classList.toggle('open');
+        b.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) updateLogicExample();
+      });
+    })();
+    document.getElementById('theme-toggle').addEventListener('click', function(){
+      var root=document.documentElement;
+      var t=root.getAttribute('data-theme')==='dark'?'light':'dark';
+      root.setAttribute('data-theme',t);
+      try{localStorage.setItem('vp-theme',t);}catch(e){}
+    });
+  </script>
+</body>
+</html>

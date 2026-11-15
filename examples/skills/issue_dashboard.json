@@ -1,0 +1,11 @@
+{
+ "name": "issue_dashboard",
+ "title": "Issue / Costing Dashboard (store issues by plant, department, cost centre, equipment, item)",
+ "description": "Store / material issue value from VIEW_ISSUE_ENGINE_PBI - exact logic of 'Issue_Dashboard_v3.html' (Costing Intelligence). Use for: '/issue_dashboard', 'issue report', 'store issue', 'material issue', 'issue value', 'costing', 'consumption by plant / department / cost centre / equipment', 'top issued items'.",
+ "rules": "SOURCE\n1. Data: VIEW_ISSUE_ENGINE_PBI (one row per issue line: VRDATE, VRNO, DEPT_NAME, PLANT_NAME, DIV_CODE, ITEM_GROUP, COST_NAME, EQPT_NAME, ITEM_CODE, ITEM_NAME, UM, QTY_ISSUED, RATE, VAL_ISSUED).\n2. ALWAYS use run_report_engine(skill_name='issue_dashboard', from_date, to_date). Never write SQL for this report.\n3. Period = issue date (VRDATE). Default = this month so far. 'yesterday' = from_date = to_date = yesterday.\n4. Value = VAL_ISSUED, shown in Rs Lakh. Compared with the same days of the previous month.\n5. Division (U1/U2 from DIV_CODE) and the user's plant list (PLANT_NAME) are applied by the engine on the server - never mention other plants.\nOUTPUT\nKPI cards, plant / department / item group / cost centre / equipment tables, top 25 items, and the Issue dashboard (slicers, breakdowns, rate analysis, matrix, data, Excel export).",
+ "output_format": "Call run_report_engine ONCE. It delivers KPI cards (issue value Rs Lakh vs previous period, lines, vouchers, items, top plant, top department), the tables and the live dashboard by itself. Reply with a 2-3 line summary: total value, biggest plant and department, biggest change.",
+ "default_formats": ["table", "chart"],
+ "sql_template": "{\n \"engine\": \"issue\",\n \"source\": \"VIEW_ISSUE_ENGINE_PBI\",\n \"formats\": [\n  \"table\",\n  \"chart\",\n  \"html\",\n  \"excel\",\n  \"dashboard\"\n ],\n \"template\": \"app/templates/dashboards/issue_dashboard_v4.html\"\n}",
+ "example_output": "KPI cards: Issue value 412.35 Rs Lakh (vs Sep 398.10) | Lines 8,214 | Vouchers 1,902 | Items 2,311 | Top plant SMLS PIPE 98.4 L | Top department MAINTENANCE 61.2 L. Then plant / department / item group / cost centre / equipment tables, top 25 items and the dashboard.",
+ "allowed_roles": []
+}
