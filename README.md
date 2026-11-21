@@ -1,4 +1,4 @@
-# VERONICA AI — reporting assistant for Venus Pipes & Tubes (MySQL + Claude)
+# VERONICA AI — Reporting Assistant   (Oracle DB + Python + MySQL + Claude)
 
 <img width="1917" height="1061" alt="Screenshot 2026-10-28 174715" src="https://github.com/user-attachments/assets/35f587a4-e188-4738-ab7e-2156eee547ee" />
 
