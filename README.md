@@ -1,5 +1,9 @@
 # VERONICA AI — reporting assistant for Venus Pipes & Tubes (MySQL + Claude)
 
+<img width="1917" height="1061" alt="Screenshot 2026-10-28 174715" src="https://github.com/user-attachments/assets/35f587a4-e188-4738-ab7e-2156eee547ee" />
+
+
+
 Managers ask in **English, हिंदी, ગુજરાતી or मराठी** (native script or Hinglish) and get answers from the ERP as
 **chat tables, Excel, PDF, charts, HTML and live dashboards** — only within the access their role allows.
 Company report formats are taught once and run forever as `/commands`.
