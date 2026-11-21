@@ -4,6 +4,8 @@
 
 
 
+
+
 Managers ask in **English, हिंदी, ગુજરાતી or मराठी** (native script or Hinglish) and get answers from the ERP as
 **chat tables, Excel, PDF, charts, HTML and live dashboards** — only within the access their role allows.
 Company report formats are taught once and run forever as `/commands`.
