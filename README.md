@@ -10,6 +10,13 @@ Managers ask in **English, हिंदी, ગુજરાતી or मरा�
 **chat tables, Excel, PDF, charts, HTML and live dashboards** — only within the access their role allows.
 Company report formats are taught once and run forever as `/commands`.
 
+
+
+
+https://github.com/user-attachments/assets/137c4c6e-ee48-40a8-a191-dde6c1668914
+
+
+
 ```
  Web app (chat · dashboards · Admin Console) ─► FastAPI ─► Claude agent ─┬─► MySQL copy of the ERP (read-only)
                                                    │                      └─► Report engines ─► Excel · PDF · Chart · HTML · Dashboards
